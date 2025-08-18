@@ -1,7 +1,3 @@
-
-using System;
-using System.Collections.Generic;
-
 namespace ProdAbs.Domain.Entities
 {
     public class Prontuario

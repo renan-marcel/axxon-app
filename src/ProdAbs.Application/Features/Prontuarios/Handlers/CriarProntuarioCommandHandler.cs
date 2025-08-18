@@ -3,8 +3,6 @@ using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.Prontuarios.Commands;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Prontuarios.Handlers;
 
@@ -28,6 +26,6 @@ public class CriarProntuarioCommandHandler : IRequestHandler<CriarProntuarioComm
             TipoProntuario = request.TipoProntuario,
             QuantidadeDocumentos = 0
         };
-        return Result.Ok(dto);
+        return Result.Success(dto);
     }
 }

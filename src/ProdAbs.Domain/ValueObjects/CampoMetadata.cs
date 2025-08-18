@@ -1,6 +1,3 @@
-
-using System.Collections.Generic;
-
 namespace ProdAbs.Domain.ValueObjects
 {
     public class CampoMetadata

@@ -3,9 +3,6 @@ using ProdAbs.Application.Features.TiposDocumento.Commands;
 using ProdAbs.Application.Features.TiposDocumento.Handlers;
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ProdAbs.UnitTests
 {

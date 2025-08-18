@@ -1,7 +1,5 @@
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
-using ProdAbs.Infrastructure.Data;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Infrastructure.Data.Repositories
 {

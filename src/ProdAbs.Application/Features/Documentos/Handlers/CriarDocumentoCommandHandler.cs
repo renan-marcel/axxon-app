@@ -2,11 +2,8 @@ using MediatR;
 using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Interfaces;
-using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Documentos.Handlers;
 
@@ -33,7 +30,7 @@ public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoComman
         {
             return Result.Fail<DocumentoDTO>(uploadResult.Error);
         }
-        
+
         // Placeholder for MVP
         var dto = new DocumentoDTO
         {

@@ -1,16 +1,10 @@
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Features.Documentos.Queries;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Presentation.Api.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class DocumentosController : ControllerBase

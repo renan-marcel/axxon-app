@@ -3,9 +3,6 @@ using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.TiposDocumento.Queries;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.TiposDocumento.Handlers;
 
@@ -27,6 +24,6 @@ public class ListarTiposDocumentoQueryHandler : IRequestHandler<ListarTiposDocum
             new() { Id = Guid.NewGuid(), Nome = "Contrato Social", Campos = new List<string> { "CNPJ", "Razao Social" } },
             new() { Id = Guid.NewGuid(), Nome = "RG", Campos = new List<string> { "Nome", "CPF" } }
         };
-        return Result.Ok(dtos);
+        return Result.Success(dtos);
     }
 }

@@ -1,8 +1,6 @@
 using MediatR;
 using ProdAbs.Application.DTOs;
 using ProdAbs.SharedKernel;
-using System.IO;
-using System.Collections.Generic;
 
 namespace ProdAbs.Application.Features.Documentos.Commands;
 

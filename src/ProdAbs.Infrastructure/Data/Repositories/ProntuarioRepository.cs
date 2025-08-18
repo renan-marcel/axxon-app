@@ -1,7 +1,5 @@
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
-using ProdAbs.Infrastructure.Data;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Infrastructure.Data.Repositories
 {
@@ -22,12 +20,6 @@ namespace ProdAbs.Infrastructure.Data.Repositories
         public async Task<Prontuario> GetByIdAsync(Guid id)
         {
             return await _context.Prontuarios.FindAsync(id);
-        }
-
-        public Task UpdateAsync(Prontuario prontuario)
-        {
-            _context.Prontuarios.Update(prontuario);
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,6 +1,5 @@
 using MediatR;
 using ProdAbs.SharedKernel;
-using System;
 
 namespace ProdAbs.Application.Features.Prontuarios.Commands;
 

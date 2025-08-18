@@ -1,7 +1,5 @@
 
 using ProdAbs.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Domain.Interfaces
 {

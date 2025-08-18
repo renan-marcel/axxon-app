@@ -1,6 +1,3 @@
-
-using System;
-
 namespace ProdAbs.SharedKernel
 {
     public class Result

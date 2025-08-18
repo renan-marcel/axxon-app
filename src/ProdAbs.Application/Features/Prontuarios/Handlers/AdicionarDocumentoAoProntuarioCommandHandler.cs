@@ -1,8 +1,6 @@
 using MediatR;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Prontuarios.Commands;
 
@@ -21,6 +19,6 @@ public class AdicionarDocumentoAoProntuarioCommandHandler : IRequestHandler<Adic
     {
         // Placeholder for MVP
         await Task.CompletedTask;
-        return Result.Ok();
+        return Result.Success();
     }
 }

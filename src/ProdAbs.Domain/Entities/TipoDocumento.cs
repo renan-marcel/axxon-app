@@ -1,7 +1,3 @@
-
-using System;
-
-using System.Collections.Generic;
 using ProdAbs.Domain.ValueObjects;
 
 namespace ProdAbs.Domain.Entities

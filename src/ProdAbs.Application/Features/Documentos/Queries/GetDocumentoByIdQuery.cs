@@ -1,7 +1,6 @@
 using MediatR;
 using ProdAbs.Application.DTOs;
 using ProdAbs.SharedKernel;
-using System;
 
 namespace ProdAbs.Application.Features.Documentos.Queries;
 

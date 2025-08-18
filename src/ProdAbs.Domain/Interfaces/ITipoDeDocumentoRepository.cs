@@ -1,8 +1,5 @@
 
 using ProdAbs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Domain.Interfaces
 {

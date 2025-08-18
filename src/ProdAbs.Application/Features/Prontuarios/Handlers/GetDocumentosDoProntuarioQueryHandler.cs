@@ -3,9 +3,6 @@ using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.Prontuarios.Queries;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Prontuarios.Handlers;
 
@@ -27,6 +24,6 @@ public class GetDocumentosDoProntuarioQueryHandler : IRequestHandler<GetDocument
             new() { Id = Guid.NewGuid(), NomeArquivoOriginal = "doc1.pdf", Formato = "application/pdf" },
             new() { Id = Guid.NewGuid(), NomeArquivoOriginal = "doc2.jpg", Formato = "image/jpeg" }
         };
-        return Result.Ok(dtos);
+        return Result.Success(dtos);
     }
 }

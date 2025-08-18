@@ -3,8 +3,6 @@ using ProdAbs.Application.Features.Documentos.Queries;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Documentos.Handlers;
 

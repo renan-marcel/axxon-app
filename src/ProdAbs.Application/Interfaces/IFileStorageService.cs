@@ -1,7 +1,5 @@
 
 using ProdAbs.SharedKernel;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Interfaces
 {

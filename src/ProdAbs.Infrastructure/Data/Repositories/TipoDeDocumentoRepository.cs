@@ -1,9 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
-using ProdAbs.Infrastructure.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Infrastructure.Data.Repositories
 {
@@ -24,11 +20,6 @@ namespace ProdAbs.Infrastructure.Data.Repositories
         public async Task<TipoDocumento> GetByIdAsync(Guid id)
         {
             return await _context.TiposDeDocumento.FindAsync(id);
-        }
-
-        public async Task<List<TipoDocumento>> ListAsync()
-        {
-            return await _context.TiposDeDocumento.ToListAsync();
         }
     }
 }

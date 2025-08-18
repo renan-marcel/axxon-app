@@ -1,9 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProdAbs.CrossCutting;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,4 +94,4 @@ app.MapControllers();
 
 app.MapDefaultEndpoints();
 
-app.Run();
+await app.RunAsync();
