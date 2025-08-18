@@ -1,25 +1,33 @@
 using MediatR;
-using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.TiposDocumento.Commands;
+using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProdAbs.Application.Features.TiposDocumento.Handlers;
-
-public class CriarTipoDocumentoCommandHandler : IRequestHandler<CriarTipoDocumentoCommand, Result<TipoDocumentoDetalhesDTO>>
+namespace ProdAbs.Application.Features.TiposDocumento.Handlers
 {
-    private readonly ITipoDeDocumentoRepository _repository;
-
-    public CriarTipoDocumentoCommandHandler(ITipoDeDocumentoRepository repository)
+    public class CriarTipoDocumentoCommandHandler : IRequestHandler<CriarTipoDocumentoCommand, Result<System.Guid>>
     {
-        _repository = repository;
-    }
+        private readonly ITipoDeDocumentoRepository _tipoDeDocumentoRepository;
 
-    public async Task<Result<TipoDocumentoDetalhesDTO>> Handle(CriarTipoDocumentoCommand request, CancellationToken cancellationToken)
-    {
-        // Placeholder for MVP
-        await Task.CompletedTask;
-        var dto = new TipoDocumentoDetalhesDTO { Id = Guid.NewGuid(), Nome = request.Nome, Campos = request.Campos };
-        return Result.Success(dto);
+        public CriarTipoDocumentoCommandHandler(ITipoDeDocumentoRepository tipoDeDocumentoRepository)
+        {
+            _tipoDeDocumentoRepository = tipoDeDocumentoRepository;
+        }
+
+        public async Task<Result<System.Guid>> Handle(CriarTipoDocumentoCommand request, CancellationToken cancellationToken)
+        {
+            var tipoDocumento = new TipoDocumento
+            {
+                Nome = request.Nome,
+                Campos = request.Campos
+            };
+
+            await _tipoDeDocumentoRepository.AddAsync(tipoDocumento);
+
+            return Result.Ok(tipoDocumento.Id);
+        }
     }
 }

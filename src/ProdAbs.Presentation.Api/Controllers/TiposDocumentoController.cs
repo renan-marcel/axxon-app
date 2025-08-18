@@ -1,7 +1,10 @@
+
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.TiposDocumento.Commands;
 using ProdAbs.Application.Features.TiposDocumento.Queries;
+using ProdAbs.SharedKernel;
+using System.Threading.Tasks;
 
 namespace ProdAbs.Presentation.Api.Controllers
 {
@@ -17,26 +20,17 @@ namespace ProdAbs.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar([FromBody] CriarTipoDocumentoCommand command)
+        public async Task<IActionResult> CriarTipoDocumento([FromBody] CriarTipoDocumentoCommand command)
         {
             var result = await _mediator.Send(command);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return CreatedAtAction(nameof(Criar), new { id = result.Value.Id }, result.Value);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Listar()
+        public async Task<IActionResult> ListarTiposDocumento()
         {
-            var query = new ListarTiposDocumentoQuery();
-            var result = await _mediator.Send(query);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok(result.Value);
+            var result = await _mediator.Send(new ListarTiposDocumentoQuery());
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
     }
 }

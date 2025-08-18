@@ -1,25 +1,36 @@
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
+using ProdAbs.Infrastructure.Data;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProdAbs.Infrastructure.Data.Repositories
 {
     public class TipoDeDocumentoRepository : ITipoDeDocumentoRepository
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
 
-        public TipoDeDocumentoRepository(AppDbContext context)
+        public TipoDeDocumentoRepository(AppDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public async Task AddAsync(TipoDocumento tipoDocumento)
+        public Task AddAsync(TipoDocumento tipoDocumento)
         {
-            await _context.TiposDeDocumento.AddAsync(tipoDocumento);
+            _dbContext.TiposDeDocumento.Add(tipoDocumento);
+            return _dbContext.SaveChangesAsync();
         }
 
-        public async Task<TipoDocumento> GetByIdAsync(Guid id)
+        public Task<TipoDocumento> GetByIdAsync(Guid id)
         {
-            return await _context.TiposDeDocumento.FindAsync(id);
+            return _dbContext.TiposDeDocumento.FindAsync(id).AsTask();
+        }
+
+        public Task<List<TipoDocumento>> ListAsync()
+        {
+            return _dbContext.TiposDeDocumento.ToListAsync();
         }
     }
 }

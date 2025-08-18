@@ -1,9 +1,13 @@
-namespace ProdAbs.Application.DTOs;
+using System;
+using System.Collections.Generic;
 
-public class ProntuarioResumoDTO
+namespace ProdAbs.Application.DTOs
 {
-    public Guid Id { get; set; }
-    public string IdentificadorEntidade { get; set; }
-    public string TipoProntuario { get; set; }
-    public int QuantidadeDocumentos { get; set; }
+    public class ProntuarioResumoDTO
+    {
+        public Guid Id { get; set; }
+        public string IdentificadorEntidade { get; set; }
+        public string TipoProntuario { get; set; }
+        public List<Guid> DocumentoIds { get; set; }
+    }
 }

@@ -1,48 +1,72 @@
 using MediatR;
-using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Interfaces;
+using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
+using ProdAbs.SharedKernel.Events;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProdAbs.Application.Features.Documentos.Handlers;
-
-public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoCommand, Result<DocumentoDTO>>
+namespace ProdAbs.Application.Features.Documentos.Handlers
 {
-    private readonly IDocumentoRepository _documentoRepository;
-    private readonly IFileStorageService _fileStorageService;
-    private readonly IPublisher _publisher;
-
-    public CriarDocumentoCommandHandler(IDocumentoRepository documentoRepository, IFileStorageService fileStorageService, IPublisher publisher)
+    public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoCommand, Result<System.Guid>>
     {
-        _documentoRepository = documentoRepository;
-        _fileStorageService = fileStorageService;
-        _publisher = publisher;
-    }
+        private readonly IDocumentoRepository _documentoRepository;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly IMediator _mediator;
 
-    public async Task<Result<DocumentoDTO>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
-    {
-        var hash = await HashUtility.CalculateSha256Async(request.FileStream);
-        request.FileStream.Position = 0;
-
-        var uploadResult = await _fileStorageService.UploadAsync(request.FileStream, request.FileName, request.ContentType);
-        if (uploadResult.IsFailure)
+        public CriarDocumentoCommandHandler(
+            IDocumentoRepository documentoRepository,
+            IFileStorageService fileStorageService,
+            IMediator mediator)
         {
-            return Result.Fail<DocumentoDTO>(uploadResult.Error);
+            _documentoRepository = documentoRepository;
+            _fileStorageService = fileStorageService;
+            _mediator = mediator;
         }
 
-        // Placeholder for MVP
-        var dto = new DocumentoDTO
+        public async Task<Result<System.Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
         {
-            Id = Guid.NewGuid(),
-            TipoDeDocumentoId = request.TipoDocumentoId,
-            NomeArquivoOriginal = request.FileName,
-            Formato = request.ContentType,
-            TamanhoEmBytes = request.FileStream.Length,
-            Status = "Criado",
-            Versao = 1,
-            DicionarioDeCamposValores = request.DicionarioDeCamposValores
-        };
-        return Result.Ok(dto);
+            // Calculate hash
+            request.FileStream.Seek(0, SeekOrigin.Begin); // Reset stream position
+            var hash = await HashUtility.CalculateSha256Async(request.FileStream);
+
+            // Upload file
+            request.FileStream.Seek(0, SeekOrigin.Begin); // Reset stream position again for upload
+            var uploadResult = await _fileStorageService.UploadAsync(request.FileStream, request.FileName, request.ContentType);
+
+            if (uploadResult.IsFailure)
+            {
+                return Result.Fail<System.Guid>(uploadResult.Error);
+            }
+
+            var documento = new Documento
+            {
+                StorageLocation = uploadResult.Value,
+                TamanhoEmBytes = request.FileStream.Length,
+                HashTipo = "SHA256",
+                HashValor = hash,
+                NomeArquivoOriginal = request.FileName,
+                Formato = request.ContentType,
+                TipoDeDocumentoId = request.TipoDocumentoId,
+                DicionarioDeCamposValores = request.DicionarioDeCamposValores,
+                Versao = 1 // Initial version
+            };
+
+            await _documentoRepository.AddAsync(documento);
+
+            // Publish event
+            await _mediator.Publish(new DocumentoCriadoEvent
+            {
+                Id = documento.Id,
+                TipoDocumentoId = documento.TipoDeDocumentoId,
+                StorageLocation = documento.StorageLocation,
+                TamanhoEmBytes = documento.TamanhoEmBytes,
+                HashValor = documento.HashValor
+            }, cancellationToken);
+
+            return Result.Ok(documento.Id);
+        }
     }
 }

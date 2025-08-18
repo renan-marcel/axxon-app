@@ -1,31 +1,33 @@
 using MediatR;
-using ProdAbs.Application.DTOs;
 using ProdAbs.Application.Features.Prontuarios.Commands;
+using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProdAbs.Application.Features.Prontuarios.Handlers;
-
-public class CriarProntuarioCommandHandler : IRequestHandler<CriarProntuarioCommand, Result<ProntuarioResumoDTO>>
+namespace ProdAbs.Application.Features.Prontuarios.Handlers
 {
-    private readonly IProntuarioRepository _repository;
-
-    public CriarProntuarioCommandHandler(IProntuarioRepository repository)
+    public class CriarProntuarioCommandHandler : IRequestHandler<CriarProntuarioCommand, Result<System.Guid>>
     {
-        _repository = repository;
-    }
+        private readonly IProntuarioRepository _prontuarioRepository;
 
-    public async Task<Result<ProntuarioResumoDTO>> Handle(CriarProntuarioCommand request, CancellationToken cancellationToken)
-    {
-        // Placeholder for MVP
-        await Task.CompletedTask;
-        var dto = new ProntuarioResumoDTO
+        public CriarProntuarioCommandHandler(IProntuarioRepository prontuarioRepository)
         {
-            Id = Guid.NewGuid(),
-            IdentificadorEntidade = request.IdentificadorEntidade,
-            TipoProntuario = request.TipoProntuario,
-            QuantidadeDocumentos = 0
-        };
-        return Result.Success(dto);
+            _prontuarioRepository = prontuarioRepository;
+        }
+
+        public async Task<Result<System.Guid>> Handle(CriarProntuarioCommand request, CancellationToken cancellationToken)
+        {
+            var prontuario = new Prontuario
+            {
+                IdentificadorEntidade = request.IdentificadorEntidade,
+                TipoProntuario = request.TipoProntuario
+            };
+
+            await _prontuarioRepository.AddAsync(prontuario);
+
+            return Result.Ok(prontuario.Id);
+        }
     }
 }

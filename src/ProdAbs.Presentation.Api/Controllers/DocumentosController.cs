@@ -1,7 +1,12 @@
+
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Features.Documentos.Queries;
+using ProdAbs.SharedKernel;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace ProdAbs.Presentation.Api.Controllers
 {
@@ -17,49 +22,53 @@ namespace ProdAbs.Presentation.Api.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file, [FromForm] Guid tipoDocumentoId, [FromForm] Dictionary<string, string> metadados)
+        public async Task<IActionResult> UploadDocumento([FromForm] IFormFile file, [FromForm] Guid tipoDocumentoId)
         {
-            var command = new CriarDocumentoCommand
+            if (file == null || file.Length == 0)
             {
-                FileStream = file.OpenReadStream(),
-                FileName = file.FileName,
-                ContentType = file.ContentType,
-                TipoDocumentoId = tipoDocumentoId,
-                DicionarioDeCamposValores = metadados
-            };
-
-            var result = await _mediator.Send(command);
-
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
+                return BadRequest("Arquivo não enviado.");
             }
 
-            return Ok(result.Value);
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                var command = new CriarDocumentoCommand
+                {
+                    FileStream = stream,
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    TipoDocumentoId = tipoDocumentoId
+                };
+                var result = await _mediator.Send(command);
+                return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetDocumento(Guid id)
         {
             var query = new GetDocumentoByIdQuery { Id = id };
             var result = await _mediator.Send(query);
-            if (result.IsFailure)
-            {
-                return NotFound(result.Error);
-            }
-            return Ok(result.Value);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
         }
 
         [HttpGet("{id}/download")]
-        public async Task<IActionResult> Download(Guid id)
+        public async Task<IActionResult> DownloadDocumento(Guid id)
         {
             var query = new DownloadDocumentoQuery { Id = id };
             var result = await _mediator.Send(query);
+
             if (result.IsFailure)
             {
                 return NotFound(result.Error);
             }
-            return File(result.Value.Content, result.Value.ContentType, result.Value.FileName);
+
+            // Assuming the stream returned by DownloadDocumentoQuery is ready to be read
+            // and you have the original file name and content type from the DocumentoDTO
+            // For MVP, we might need to retrieve these from the DTO or pass them along.
+            // For now, just return the stream as a FileStreamResult.
+            // This part needs refinement in Phase 5 when DTOs are fully defined.
+            return File(result.Value, "application/octet-stream", "download"); // Placeholder content type and file name
         }
     }
 }

@@ -1,24 +1,39 @@
 using MediatR;
+using ProdAbs.Application.Features.Prontuarios.Commands;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProdAbs.Application.Features.Prontuarios.Commands;
-
-public class AdicionarDocumentoAoProntuarioCommandHandler : IRequestHandler<AdicionarDocumentoAoProntuarioCommand, Result>
+namespace ProdAbs.Application.Features.Prontuarios.Handlers
 {
-    private readonly IProntuarioRepository _prontuarioRepository;
-    private readonly IDocumentoRepository _documentoRepository;
-
-    public AdicionarDocumentoAoProntuarioCommandHandler(IProntuarioRepository prontuarioRepository, IDocumentoRepository documentoRepository)
+    public class AdicionarDocumentoAoProntuarioCommandHandler : IRequestHandler<AdicionarDocumentoAoProntuarioCommand, Result>
     {
-        _prontuarioRepository = prontuarioRepository;
-        _documentoRepository = documentoRepository;
-    }
+        private readonly IProntuarioRepository _prontuarioRepository;
 
-    public async Task<Result> Handle(AdicionarDocumentoAoProntuarioCommand request, CancellationToken cancellationToken)
-    {
-        // Placeholder for MVP
-        await Task.CompletedTask;
-        return Result.Success();
+        public AdicionarDocumentoAoProntuarioCommandHandler(IProntuarioRepository prontuarioRepository)
+        {
+            _prontuarioRepository = prontuarioRepository;
+        }
+
+        public async Task<Result> Handle(AdicionarDocumentoAoProntuarioCommand request, CancellationToken cancellationToken)
+        {
+            var prontuario = await _prontuarioRepository.GetByIdAsync(request.ProntuarioId);
+
+            if (prontuario == null)
+            {
+                return Result.Fail("Prontuário não encontrado.");
+            }
+
+            if (prontuario.DocumentoIds.Contains(request.DocumentoId))
+            {
+                return Result.Fail("Documento já associado a este prontuário.");
+            }
+
+            prontuario.DocumentoIds.Add(request.DocumentoId);
+            await _prontuarioRepository.UpdateAsync(prontuario);
+
+            return Result.Ok();
+        }
     }
 }

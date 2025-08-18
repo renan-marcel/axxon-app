@@ -1,25 +1,35 @@
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
+using ProdAbs.Infrastructure.Data;
+using System;
+using System.Threading.Tasks;
 
 namespace ProdAbs.Infrastructure.Data.Repositories
 {
     public class ProntuarioRepository : IProntuarioRepository
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
 
-        public ProntuarioRepository(AppDbContext context)
+        public ProntuarioRepository(AppDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public async Task AddAsync(Prontuario prontuario)
+        public Task AddAsync(Prontuario prontuario)
         {
-            await _context.Prontuarios.AddAsync(prontuario);
+            _dbContext.Prontuarios.Add(prontuario);
+            return _dbContext.SaveChangesAsync();
         }
 
-        public async Task<Prontuario> GetByIdAsync(Guid id)
+        public Task<Prontuario> GetByIdAsync(Guid id)
         {
-            return await _context.Prontuarios.FindAsync(id);
+            return _dbContext.Prontuarios.FindAsync(id).AsTask();
+        }
+
+        public Task UpdateAsync(Prontuario prontuario)
+        {
+            _dbContext.Prontuarios.Update(prontuario);
+            return _dbContext.SaveChangesAsync();
         }
     }
 }

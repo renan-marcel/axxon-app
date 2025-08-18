@@ -1,7 +1,11 @@
+
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.Prontuarios.Commands;
 using ProdAbs.Application.Features.Prontuarios.Queries;
+using ProdAbs.SharedKernel;
+using System;
+using System.Threading.Tasks;
 
 namespace ProdAbs.Presentation.Api.Controllers
 {
@@ -17,47 +21,26 @@ namespace ProdAbs.Presentation.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar([FromBody] CriarProntuarioCommand command)
+        public async Task<IActionResult> CriarProntuario([FromBody] CriarProntuarioCommand command)
         {
             var result = await _mediator.Send(command);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return CreatedAtAction(nameof(Criar), new { id = result.Value.Id }, result.Value);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
 
-        [HttpPost("{prontuarioId}/documentos")]
-        public async Task<IActionResult> AdicionarDocumento(Guid prontuarioId, [FromBody] AdicionarDocumentoRequest request)
+        [HttpPost("{prontuarioId}/documentos/{documentoId}")]
+        public async Task<IActionResult> AdicionarDocumentoAoProntuario(Guid prontuarioId, Guid documentoId)
         {
-            var command = new AdicionarDocumentoAoProntuarioCommand
-            {
-                ProntuarioId = prontuarioId,
-                DocumentoId = request.DocumentoId
-            };
+            var command = new AdicionarDocumentoAoProntuarioCommand { ProntuarioId = prontuarioId, DocumentoId = documentoId };
             var result = await _mediator.Send(command);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok();
+            return result.IsSuccess ? Ok() : BadRequest(result.Error);
         }
 
         [HttpGet("{prontuarioId}/documentos")]
-        public async Task<IActionResult> GetDocumentos(Guid prontuarioId)
+        public async Task<IActionResult> GetDocumentosDoProntuario(Guid prontuarioId)
         {
             var query = new GetDocumentosDoProntuarioQuery { ProntuarioId = prontuarioId };
             var result = await _mediator.Send(query);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok(result.Value);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
         }
-    }
-
-    public class AdicionarDocumentoRequest
-    {
-        public Guid DocumentoId { get; set; }
     }
 }

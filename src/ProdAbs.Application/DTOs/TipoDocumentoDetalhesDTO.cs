@@ -1,8 +1,13 @@
-namespace ProdAbs.Application.DTOs;
+using System;
+using System.Collections.Generic;
+using ProdAbs.Domain.ValueObjects;
 
-public class TipoDocumentoDetalhesDTO
+namespace ProdAbs.Application.DTOs
 {
-    public Guid Id { get; set; }
-    public string Nome { get; set; }
-    public List<string> Campos { get; set; } = new();
+    public class TipoDocumentoDetalhesDTO
+    {
+        public Guid Id { get; set; }
+        public string Nome { get; set; }
+        public List<CampoMetadata> Campos { get; set; }
+    }
 }

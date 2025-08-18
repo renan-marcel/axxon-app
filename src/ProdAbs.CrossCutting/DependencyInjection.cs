@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ProdAbs.Application.Interfaces;
@@ -19,8 +18,9 @@ namespace ProdAbs.CrossCutting
 
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
-            services.AddScoped<IDocumentoRepository, DocumentoRepository>();
+            // Register Repositories
             services.AddScoped<ITipoDeDocumentoRepository, TipoDeDocumentoRepository>();
+            services.AddScoped<IDocumentoRepository, DocumentoRepository>();
             services.AddScoped<IProntuarioRepository, ProntuarioRepository>();
 
             return services;
