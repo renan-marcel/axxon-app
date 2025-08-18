@@ -105,4 +105,4 @@ app.MapControllers();
 
 app.MapDefaultEndpoints();
 
-app.Run();
+await app.RunAsync();
