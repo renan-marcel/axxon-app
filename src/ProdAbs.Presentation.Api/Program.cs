@@ -1,9 +1,11 @@
-using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ProdAbs.Application;
 using ProdAbs.CrossCutting;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +16,11 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 
+// Add application services
+builder.Services.AddApplication();
+
 // Add infrastructure services
 builder.Services.AddInfrastructure();
-
-// Add MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ProdAbs.Application.Interfaces.IFileStorageService).Assembly));
 
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -75,8 +77,17 @@ app.UseExceptionHandler(c => c.Run(async context =>
     var exception = context.Features
         .Get<IExceptionHandlerPathFeature>()
         .Error;
-    var response = new { error = exception.Message };
-    await context.Response.WriteAsJsonAsync(response);
+    
+    if (exception is ValidationException validationException)
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsJsonAsync(new { error = validationException.Errors.First().ErrorMessage });
+    }
+    else
+    {
+        var response = new { error = exception.Message };
+        await context.Response.WriteAsJsonAsync(response);
+    }
 }));
 
 if (app.Environment.IsDevelopment())
@@ -94,4 +105,4 @@ app.MapControllers();
 
 app.MapDefaultEndpoints();
 
-await app.RunAsync();
+app.Run();

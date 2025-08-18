@@ -12,22 +12,22 @@ namespace ProdAbs.Application.Features.TiposDocumento.Handlers
 {
     public class ListarTiposDocumentoQueryHandler : IRequestHandler<ListarTiposDocumentoQuery, Result<List<TipoDocumentoDetalhesDTO>>>
     {
-        private readonly ITipoDeDocumentoRepository _tipoDeDocumentoRepository;
+        private readonly ITipoDeDocumentoRepository _repository;
 
-        public ListarTiposDocumentoQueryHandler(ITipoDeDocumentoRepository tipoDeDocumentoRepository)
+        public ListarTiposDocumentoQueryHandler(ITipoDeDocumentoRepository repository)
         {
-            _tipoDeDocumentoRepository = tipoDeDocumentoRepository;
+            _repository = repository;
         }
 
         public async Task<Result<List<TipoDocumentoDetalhesDTO>>> Handle(ListarTiposDocumentoQuery request, CancellationToken cancellationToken)
         {
-            var tiposDocumento = await _tipoDeDocumentoRepository.ListAsync();
+            var tiposDocumento = await _repository.ListAsync();
 
             var dtos = tiposDocumento.Select(td => new TipoDocumentoDetalhesDTO
             {
                 Id = td.Id,
                 Nome = td.Nome,
-                Campos = td.Campos
+                Campos = td.Campos.Select(c => c.Label).ToList()
             }).ToList();
 
             return Result.Ok(dtos);
