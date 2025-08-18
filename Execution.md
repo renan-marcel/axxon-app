@@ -21,6 +21,13 @@ Observação crítica: o uso do framework FluentValidation é um requisito de ne
 
 Importante o uso de .net centralized package management (centralizado) para gerenciar as versões dos pacotes NuGet utilizados no projeto. Isso garante consistência e facilita atualizações futuras.
 
+**INSTRUÇÕES DE VERSIONAMENTO**:
+Para garantir que o projeto siga as melhores práticas de versionamento, utilize o seguinte padrão para commits e tags:
+- **Commits**: Use mensagens claras e descritivas, seguindo o padrão "Tipo: Descrição" (ex.: "feat: Implementar upload de documento").
+- **Tags**: Use tags semânticas para marcar versões (ex.: `v0.1.0`, `v0.2.0`).
+- **Branches**: Utilize branches para desenvolvimento de novas funcionalidades ou correções, seguindo o padrão `feature/nome-da-funcionalidade` ou `bugfix/nome-do-bug`.
+No Inicio de cada fase, crie uma branch específica para a fase (ex.: `fase-1-configuracao-fundacao`), e ao final da fase, faça o merge com a branch principal (`main` ou `develop`).
+
 **INSTRUÇÕES PASSO A PASSO (Fases do Projeto Adaptadas para MVP):**
 
 ---
