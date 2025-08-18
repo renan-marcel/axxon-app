@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProdAbs.Application\ProdAbs.Application.csproj" />
+    <ProjectReference Include="..\ProdAbs.Infrastructure\ProdAbs.Infrastructure.csproj" />
+    <ProjectReference Include="..\ProdAbs.CrossCutting\ProdAbs.CrossCutting.csproj" />
+    <ProjectReference Include="..\ProdAbs.ServiceDefaults\ProdAbs.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>
