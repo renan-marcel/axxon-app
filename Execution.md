@@ -213,6 +213,10 @@ Próximos passos recomendados (após Fase 1)
 1.  **Implementação dos Repositórios (EF Core):**
     *   **Ação:** Em `ProjectName.Infrastructure/Data/EfCore`, criar `AppDbContext`.
     *   **Ação:** Em `ProjectName.Infrastructure/Data/Repositories`, implementar `DocumentoRepository`, `TipoDocumentoRepository`, `ProntuarioRepository` usando o `AppDbContext` do EF Core para operações de escrita e leitura.
+    *   **Ação:** em `ProjectName.Infrastructure/Data/EfCore/Configuration` configurar as entidades no `AppDbContext` (DbSet<TipoDocumento>, DbSet<Documento>, DbSet<Prontuario>) .
+    *   **Ação:** Configurar o EF Core para usar PostgreSQL
+    *   **Ação:** Configurar migrations para criar o banco de dados inicial (SQLite ou PostgreSQL).
+    *   **Ação:** Criar uma migration inicial e aplicar ao banco de dados (PostgreSQL).
     *   **Entrega:** Repositórios funcionais para persistência do domínio via EF Core.
 2.  **Implementação do `LocalFileStorageService`:**
     *   **Ação:** Em `ProjectName.Infrastructure/FileStorage`, criar `LocalFileStorageService` que implementa `IFileStorageService`. Este serviço deve salvar/carregar arquivos em uma pasta local configurável (e.g., via `IOptions<FileStorageSettings>`).
