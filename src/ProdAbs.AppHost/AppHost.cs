@@ -7,9 +7,9 @@ var postgres = builder.AddPostgres("postgres")
 
 var pgAdmin = postgres.WithPgAdmin(pgadmin => pgadmin.WithHostPort(9200));
 
-var ged_db = postgres.AddDatabase("ged-db");
+var gedDb = postgres.AddDatabase("ged-db");
 
-var event_store_db = postgres.AddDatabase("event-store-db");
+var eventStoreDb = postgres.AddDatabase("event-store-db");
 
 var zookeeper = builder.AddContainer("zookeeper", "confluentinc/cp-zookeeper", "latest")
     .WithEnvironment("ZOOKEEPER_CLIENT_PORT", "2181")
@@ -50,13 +50,13 @@ var seq = builder.AddSeq("seq")
 builder.AddProject<Projects.ProdAbs_Presentation_Api>("prodabs-api")
        .WithReference(postgres)
        .WithReference(kafka)
-       .WithReference(ged_db)
-       .WithReference(event_store_db)
+       .WithReference(gedDb,"ged_db")
+       .WithReference(eventStoreDb,"event_store_db")
        .WithReference(kafka)
        .WithReference(seq)
        .WaitFor(kafka)
        .WaitFor(seq)
-       .WaitFor(ged_db)
-       .WaitFor(event_store_db);
+       .WaitFor(gedDb)
+       .WaitFor(eventStoreDb);
 
 await builder.Build().RunAsync();

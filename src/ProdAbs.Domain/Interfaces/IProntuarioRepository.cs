@@ -5,7 +5,7 @@ namespace ProdAbs.Domain.Interfaces
 {
     public interface IProntuarioRepository
     {
-        Task<Prontuario> GetByIdAsync(Guid id);
+        Task<Prontuario?> GetByIdAsync(Guid id);
         Task AddAsync(Prontuario prontuario);
         Task UpdateAsync(Prontuario prontuario);
     }

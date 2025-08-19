@@ -11,7 +11,7 @@ namespace ProdAbs.Infrastructure.Data
         }
 
         public DbSet<TipoDocumento> TiposDeDocumento { get; set; }
-        public DbSet<Documento> Documentos { get; set; }
+        public DbSet<Documento?> Documentos { get; set; }
         public DbSet<Prontuario> Prontuarios { get; set; }
     }
 }

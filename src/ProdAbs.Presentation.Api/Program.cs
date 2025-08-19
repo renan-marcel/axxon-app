@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ProdAbs.Application;
 using ProdAbs.CrossCutting;
 using System.Text;
+using ProdAbs.Infrastructure;
+using ProdAbs.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +17,8 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 
-// Add application services
-builder.Services.AddApplication();
-
-// Add infrastructure services
-builder.Services.AddInfrastructure();
+// Add infrastructure and application services
+builder.Services.AddCrossCutting();
 
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -89,6 +87,8 @@ app.UseExceptionHandler(c => c.Run(async context =>
         await context.Response.WriteAsJsonAsync(response);
     }
 }));
+
+await DbInitializer.Initialize(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
