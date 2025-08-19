@@ -196,8 +196,7 @@ A estrutura de pastas e projetos reflete a arquitetura de camadas:
 *   **Docker**: Para conteinerização.
 *   **Git**: Controle de versão.
 *   **MassTransit**: Para mensageria e eventos de domínio.
-*   **Marten**: Para Event Sourcing, utilizado especificamente para a trilha de auditoria.
-*   **PostgreSQL**: Banco de dados principal, utilizado em duas instâncias separadas: uma para os dados da aplicação (via EF Core) e outra dedicada para a trilha de auditoria (via Marten).
+*   **PostgreSQL**: Banco de dados principal, utilizado em duas instâncias separadas: uma para os dados da aplicação (via EF Core) e outra dedicada para a trilha de auditoria.
 *   **SonarAnalyzer.CSharp**: Análise de código estático.
 *   **Keycloak**: Para gerenciamento de identidade e acesso.
 *   **OpenTelemetry**: Para coleta de telemetria.
@@ -219,9 +218,9 @@ A estrutura de pastas e projetos reflete a arquitetura de camadas:
 
 *   **Estratégia de Duas Bases de Dados:** Para garantir um isolamento robusto entre os dados operacionais e os dados de auditoria, utilizaremos duas bases de dados PostgreSQL separadas:
     1.  **Base de Dados da Aplicação:** Contém o estado atual de todas as entidades (`Documento`, `TipoDeDocumento`, `Prontuario`, etc.). É gerenciada pelo **Entity Framework Core**.
-    2.  **Base de Dados de Auditoria:** Contém um log imutável de todos os eventos que modificam o estado do sistema. É gerenciada pelo **Marten**, atuando como nossa trilha de auditoria (`Audit Trail`).
+    2.  **Base de Dados de Auditoria:** Contém um log imutável de todos os eventos que modificam o estado do sistema, atuando como nossa trilha de auditoria (`Audit Trail`).
 *   **CQRS (Command Query Responsibility Segregation):** Adotaremos um estilo CQRS leve.
-    *   **Lado de Escrita (Commands):** Utilização de **Entity Framework Core** para persistir o estado atual dos agregados na base de dados da aplicação. Eventos de domínio são despachados para registrar as alterações na base de dados de auditoria via Marten.
+    *   **Lado de Escrita (Commands):** Utilização de **Entity Framework Core** para persistir o estado atual dos agregados na base de dados da aplicação. Eventos de domínio são despachados para registrar as alterações na base de dados de auditoria.
     *   **Lado de Leitura (Queries):** Utilização de **Entity Framework Core** sobre a base de dados da aplicação para consultas e projeções otimizadas.
 *   **Padrão Repository & Unit of Work:** Interfaces de repositório definidas na camada `Domain` e implementadas na `Infrastructure`, operando sobre a base de dados da aplicação.
 *   **Design por Domínio (Domain-Driven Design - DDD):** Aplicaremos conceitos de DDD como Agregados, Raízes de Agregados (formalizados através da herança da classe base **`AggregateRoot<TId>`** para `Documento`, `TipoDeDocumento` e `Prontuario`), e Value Objects (`CampoMetadata`, `RegraValidacao`) para modelar o domínio de forma rica e transacionalmente consistente.
@@ -245,7 +244,7 @@ A estrutura de pastas e projetos reflete a arquitetura de camadas:
 
 ### 6.6. Configuração
 
-*   Utilização de `appsettings.json`, variáveis de ambiente e serviços de segredos (Azure Key Vault). O arquivo de configuração conterá duas connection strings distintas: uma para a base de dados da aplicação (EF Core) e outra para a base de dados de auditoria (Marten).
+*   Utilização de `appsettings.json`, variáveis de ambiente e serviços de segredos (Azure Key Vault). O arquivo de configuração conterá duas connection strings distintas: uma para a base de dados da aplicação (EF Core) e outra para a base de dados de auditoria.
 *   Padrão `IOptions<T>` para injeção de configurações tipadas.
 
 ### 6.7. Testes
@@ -257,7 +256,7 @@ A estrutura de pastas e projetos reflete a arquitetura de camadas:
 ### 6.8. Padrões de Projeto Adicionais
 
 *   **Builder Pattern**: Para criação de objetos complexos (ex: DTOs, Commands).
-*   **Event Sourcing para Auditoria**: Implementado com **Marten** para garantir um histórico imutável de todas as alterações, fundamental para a trilha de auditoria.
+*   **Auditoria**: Implementado para garantir um histórico imutável de todas as alterações, fundamental para a trilha de auditoria.
 *   **Scheduler/Background Jobs**: Para tarefas como verificação de vencimento de documentos (via Hosted Services).
 
 ### 6.9. Estratégia de Armazenamento de Arquivos Digitais
@@ -313,7 +312,7 @@ A arquitetura é flexível para suportar ambos os cenários. A diferenciação o
 
 *   **Controle de Acesso Baseado em Papéis (RBAC):** Integrado com Keycloak.
 *   **Criptografia:** Dados sensíveis em repouso e em trânsito.
-*   **Trilha de Auditoria (Audit Trail):** O uso de Event Sourcing com Marten, especificamente para a auditoria, garante uma trilha de alterações completa e imutável, armazenada em uma base de dados dedicada e isolada para máxima segurança.
+*   **Trilha de Auditoria (Audit Trail):** A auditoria garante uma trilha de alterações completa e imutável, armazenada em uma base de dados dedicada e isolada para máxima segurança.
 *   **Políticas de Retenção e Descarte:** As `Regras de Vencimento` guiam o ciclo de vida dos documentos.
 *   **Integridade via Hash:** O hash armazenado garante a não-repúdio e a integridade do documento.
 

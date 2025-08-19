@@ -13,7 +13,7 @@ Implementar a funcionalidade essencial para:
 8.  **Observabilidade Básica:** Logging e telemetria via Serilog/OpenTelemetry.
 
 **RECURSOS ARQUITETÔNICOS:**
-Consulte o `GEMINI.md` para todos os detalhes sobre camadas e padrões (Clean Architecture, CQRS, Event Sourcing, Result) e estrutura de projetos.
+Consulte o `GEMINI.md` para todos os detalhes sobre camadas e padrões (Clean Architecture, CQRS, Result) e estrutura de projetos.
 
 Importante: o framework Aspire.NET é um requisito técnico obrigatório para este projeto. Aspire será a plataforma de execução/orquestração no ambiente de desenvolvimento e produção, provendo integração com infraestrutura observability/telemetria, orquestração de serviços, e integração com Postgres/RabbitMQ/Marten/MassTransit quando aplicável.
 
@@ -54,10 +54,10 @@ No Inicio de cada fase, crie uma branch específica para a fase (ex.: `fase-1-co
         *   **Ação realizada:** Pacotes essenciais adicionados (MediatR, EF Core SQLite, Swashbuckle, Serilog, JWT Bearer) e referências de projeto configuradas.
         *   **Entrega:** Estrutura de projetos estabelecida e `dotnet build` executado com sucesso (veja saída no terminal).
 4.  **Configuração do Aspire.NET (obrigatório):**
-        *   **Descrição:** Aspire.NET deve ser configurado como plataforma de execução/orquestração desde a Fase 1. Para o MVP isso significa prover um ambiente local (ou containerizado) com os serviços essenciais que o sistema espera: PostgreSQL (banco principal), RabbitMQ (mensageria), e suporte a Marten/MassTransit quando usarmos Event Sourcing e mensageria. Aspire também será usado para padronizar as configurações de telemetria/OpenTelemetry e health checks.
+        *   **Descrição:** Aspire.NET deve ser configurado como plataforma de execução/orquestração desde a Fase 1. Para o MVP isso significa prover um ambiente local (ou containerizado) com os serviços essenciais que o sistema espera: PostgreSQL (banco principal), RabbitMQ (mensageria), e suporte a MassTransit quando aplicável. Aspire também será usado para padronizar as configurações de telemetria/OpenTelemetry e health checks.
         *   **Ações práticas:**
             - Provisionar um ambiente local de desenvolvimento baseado no stack do Aspire (p.ex. um docker-compose/stack fornecido pelo time Aspire ou templates oficiais). Esse stack deve expor as variáveis de conexão necessárias ao `appsettings.Development.json` (ConnectionStrings:Postgres, RabbitMQ:Host/User/Password, AspNetCore/Ports).
-            - Garantir que a aplicação integre com Aspire via as extensões/bootstrapping definidas pelo projeto (ex.: registrar MassTransit com RabbitMQ, configurar Marten para Postgres, configurar OpenTelemetry/Serilog com endpoints/collectors fornecidos pelo Aspire). Se o projeto já possuir uma camada CrossCutting/DependencyInjection, adicionar um método para aplicar as configurações específicas do Aspire (ex.: AddAspireConfiguration or RegisterAspireServices) seguindo as convenções internas do repositório.
+            - Garantir que a aplicação integre com Aspire via as extensões/bootstrapping definidas pelo projeto (ex.: registrar MassTransit com RabbitMQ, configurar OpenTelemetry/Serilog com endpoints/collectors fornecidos pelo Aspire). Se o projeto já possuir uma camada CrossCutting/DependencyInjection, adicionar um método para aplicar as configurações específicas do Aspire (ex.: AddAspireConfiguration or RegisterAspireServices) seguindo as convenções internas do repositório.
             - Documentar no README ou em `docs/` o passo-a-passo para subir o stack Aspire em dev: onde obter os manifests, quais variáveis de ambiente setar, e como validar que os serviços (Postgres/RabbitMQ) ficaram disponíveis.
         *   **Critérios de aceitação (mínimos):**
             - Um comando único (ou script) que sobe o ambiente Aspire local com PostgreSQL e RabbitMQ e deixa a API apta a conectar-se a esses serviços.
@@ -210,19 +210,17 @@ Próximos passos recomendados (após Fase 1)
 
 **FASE 4: Integrações de Infraestrutura Essenciais (Prioridade Alta)**
 
-1.  **Implementação dos Repositórios (Marten & EF Core):**
-    *   **Ação:** Em `ProjectName.Infrastructure/Data/Marten`, configurar o `MartenRegistry` para mapear os agregados `TipoDeDocumento`, `Documento`, `Prontuario` e os eventos de domínio.
+1.  **Implementação dos Repositórios (EF Core):**
     *   **Ação:** Em `ProjectName.Infrastructure/Data/EfCore`, criar `AppDbContext`.
-    *   **Ação:** Em `ProjectName.Infrastructure/Data/Repositories`, implementar `DocumentoRepository`, `TipoDocumentoRepository`, `ProntuarioRepository` usando o `IDocumentSession` do Marten para operações de escrita. Para queries de leitura de documentos/prontuários/tipos (que não precisam de Event Sourcing), usar o `AppDbContext` do EF Core.
-    *   **Ação:** Criar uma projeção Marten inicial (em `ProjectName.Infrastructure/Data/Marten/Projections`) que consome `DocumentoCriadoEvent` (via MassTransit) e popula um `DocumentoReadModel` no EF Core para consultas otimizadas.
-    *   **Entrega:** Repositórios funcionais para persistência do domínio via Marten e consultas via EF Core.
+    *   **Ação:** Em `ProjectName.Infrastructure/Data/Repositories`, implementar `DocumentoRepository`, `TipoDocumentoRepository`, `ProntuarioRepository` usando o `AppDbContext` do EF Core para operações de escrita e leitura.
+    *   **Entrega:** Repositórios funcionais para persistência do domínio via EF Core.
 2.  **Implementação do `LocalFileStorageService`:**
     *   **Ação:** Em `ProjectName.Infrastructure/FileStorage`, criar `LocalFileStorageService` que implementa `IFileStorageService`. Este serviço deve salvar/carregar arquivos em uma pasta local configurável (e.g., via `IOptions<FileStorageSettings>`).
     *   **Entrega:** Serviço de armazenamento de arquivos local funcional.
 3.  **Configuração do MassTransit (Mínimo para Eventos):**
     *   **Ação:** Em `ProjectName.Infrastructure/Messaging`, configurar o MassTransit para se conectar ao RabbitMQ (orquestrado pelo Aspire).
-    *   **Ação:** Registrar o *consumer* da projeção Marten (`DocumentoReadModelProjection`) para o `DocumentoCriadoEvent`.
-    *   **Entrega:** Mensageria de eventos básica funcionando para Event Sourcing.
+    *   **Ação:** Registrar o *consumer* da projeção (`DocumentoReadModelProjection`) para o `DocumentoCriadoEvent`.
+    *   **Entrega:** Mensageria de eventos básica funcionando.
 4.  **Configuração de Injeção de Dependência:**
     *   **Ação:** Em `ProjectName.CrossCutting/DependencyInjection.cs`, configurar todos os serviços, repositórios e handlers para injeção de dependência. Garantir que a implementação de `IFileStorageService` (`LocalFileStorageService`) seja registrada.
 
@@ -284,7 +282,7 @@ Próximos passos recomendados (após Fase 1)
     *   **Ação:** Mockar `IFileStorageService`, `IDocumentoRepository`, etc., nos testes da camada Application.
     *   **Entrega:** Conjunto robusto de testes unitários para o MVP.
 2.  **Testes de Integração:**
-    *   **Ação:** Escrever testes de integração para os repositórios (Marten e EF Core) para verificar a persistência correta.
+    *   **Ação:** Escrever testes de integração para os repositórios (EF Core) para verificar a persistência correta.
     *   **Ação:** Escrever testes de integração para o `LocalFileStorageService`.
     *   **Ação:** Escrever testes de integração da API (Web.Tests) para validar os fluxos completos do MVP, incluindo upload, download e criação de prontuários.
     *   **Entrega:** Testes de integração para as funcionalidades do MVP.
