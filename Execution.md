@@ -239,37 +239,6 @@ Próximos passos recomendados (após Fase 1)
 
 ---
 
-**FASE 4: Integrações de Infraestrutura Essenciais (Prioridade Alta)**
-
-1.  **Implementação dos Repositórios (EF Core):**
-    *   **Ação:** Em `ProjectName.Infrastructure/Data/EfCore`, criar `AppDbContext`.
-    *   **Ação:** Em `ProjectName.Infrastructure/Data/Repositories`, implementar `DocumentoRepository`, `TipoDocumentoRepository`, `ProntuarioRepository` usando o `AppDbContext` do EF Core para operações de escrita e leitura.
-    *   **Ação:** em `ProjectName.Infrastructure/Data/EfCore/Configuration` configurar as entidades no `AppDbContext` (DbSet<TipoDocumento>, DbSet<Documento>, DbSet<Prontuario>) .
-    *   **Ação:** Configurar o EF Core para usar PostgreSQL
-    *   **Ação:** Configurar migrations para criar o banco de dados inicial (SQLite ou PostgreSQL).
-    *   **Ação:** Criar uma migration inicial e aplicar ao banco de dados (PostgreSQL).
-    *   **Entrega:** Repositórios funcionais para persistência do domínio via EF Core.
-2.  **Implementação do `LocalFileStorageService`:**
-    *   **Ação:** Em `ProjectName.Infrastructure/FileStorage`, criar `LocalFileStorageService` que implementa `IFileStorageService`. Este serviço deve salvar/carregar arquivos em uma pasta local configurável (e.g., via `IOptions<FileStorageSettings>`).
-    *   **Entrega:** Serviço de armazenamento de arquivos local funcional.
-3.  **Configuração do MassTransit (Mínimo para Eventos):**
-    *   **Ação:** Em `ProjectName.Infrastructure/Messaging`, configurar o MassTransit para se conectar ao RabbitMQ (orquestrado pelo Aspire).
-    *   **Ação:** Registrar o *consumer* da projeção (`DocumentoReadModelProjection`) para o `DocumentoCriadoEvent`.
-    *   **Entrega:** Mensageria de eventos básica funcionando.
-4.  **Configuração de Injeção de Dependência:**
-    *   **Ação:** Em `ProjectName.CrossCutting/DependencyInjection.cs`, configurar todos os serviços, repositórios e handlers para injeção de dependência. Garantir que a implementação de `IFileStorageService` (`LocalFileStorageService`) seja registrada.
-
-**Entregas da Fase:** Integração completa entre Application e Infrastructure para persistência e armazenamento de arquivos. Testes de integração para os repositórios e `LocalFileStorageService`.
-
-**Testes nesta fase:**
-- Criar testes de integração para:
-  - `AppDbContext` (in-memory ou SQLite).
-  - `LocalFileStorageService` (upload/download/delete).
-  - Repositórios (`TipoDocumentoRepository`, `DocumentoRepository`, `ProntuarioRepository`).
-- **Confirmação antes de avançar:** todos os testes de integração passando para persistência e storage.
-
----
-
 **FASE 5: Desenvolvimento da Camada de Apresentação (API Core) (Prioridade Alta)**
 
 1.  **Criação de Controllers para MVP:**

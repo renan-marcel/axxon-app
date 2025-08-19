@@ -20,7 +20,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddApplication();
 
 // Add infrastructure services
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
