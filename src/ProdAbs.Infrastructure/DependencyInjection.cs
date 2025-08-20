@@ -1,6 +1,4 @@
-using System;
 using MassTransit;
-using MassTransit.KafkaIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,65 +10,63 @@ using ProdAbs.Infrastructure.Messaging;
 using ProdAbs.Infrastructure.Services;
 using ProdAbs.SharedKernel.Events;
 
-namespace ProdAbs.Infrastructure
+namespace ProdAbs.Infrastructure;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("gedDb")));
+
+        services.AddScoped<ITipoDeDocumentoRepository, TipoDeDocumentoRepository>();
+        services.AddScoped<IDocumentoRepository, DocumentoRepository>();
+        services.AddScoped<IProntuarioRepository, ProntuarioRepository>();
+
+        services.AddScoped<IFileStorageService>(provider =>
         {
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("gedDb")));
+            var storageProvider = configuration["StorageSettings:Provider"];
 
-            services.AddScoped<ITipoDeDocumentoRepository, TipoDeDocumentoRepository>();
-            services.AddScoped<IDocumentoRepository, DocumentoRepository>();
-            services.AddScoped<IProntuarioRepository, ProntuarioRepository>();
+            if (string.IsNullOrEmpty(storageProvider))
+                throw new InvalidOperationException("Storage provider is not configured.");
 
-            services.AddScoped<IFileStorageService>(provider =>
+            switch (storageProvider)
             {
-                var storageProvider = configuration["StorageSettings:Provider"];
- 
-                if (string.IsNullOrEmpty(storageProvider))
-                {
-                    throw new InvalidOperationException("Storage provider is not configured.");
-                }
+                case "Azure":
+                    return new AzureBlobStorageService(configuration);
+                default:
+                    return new LocalFileStorageService(configuration);
+            }
+        });
 
-                switch (storageProvider)
-                {
-                    case "Azure":
-                        return new AzureBlobStorageService(configuration);
-                    default:
-                        return new LocalFileStorageService(configuration);
-                }
-            });
+        // Register application external services
+        services.AddScoped<IEmailNotifier, LocalEmailNotifier>();
+        services.AddScoped<IAuditLogger, SimpleAuditLogger>();
 
-            // Register application external services
-            services.AddScoped<IEmailNotifier, LocalEmailNotifier>();
-            services.AddScoped<IAuditLogger, SimpleAuditLogger>();
+        services.AddMassTransit(busConfig =>
+        {
+            busConfig.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
 
-            services.AddMassTransit(busConfig =>
+            busConfig.AddRider(rider =>
             {
-                busConfig.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+                rider.AddProducer<Guid, IDocumentoCriadoEvent>("documento-criado-topic");
+                rider.AddConsumer<DocumentoCriadoConsumer>();
 
-                busConfig.AddRider(rider =>
+                rider.UsingKafka((context, k) =>
                 {
-                    rider.AddProducer<Guid, IDocumentoCriadoEvent>("documento-criado-topic");
-                    rider.AddConsumer<DocumentoCriadoConsumer>();
+                    k.Host(configuration.GetConnectionString("kafka"));
 
-                    rider.UsingKafka((context, k) =>
+
+                    k.TopicEndpoint<IDocumentoCriadoEvent>("documento-criado-topic", "consumer-group-name", e =>
                     {
-                        k.Host(configuration.GetConnectionString("kafka"));
-
-
-                        k.TopicEndpoint<IDocumentoCriadoEvent>("documento-criado-topic", "consumer-group-name", e =>
-                        {
-                            e.ConfigureConsumer<DocumentoCriadoConsumer>(context);
-                            e.AutoStart = true;
-                        });
+                        e.ConfigureConsumer<DocumentoCriadoConsumer>(context);
+                        e.AutoStart = true;
                     });
                 });
             });
+        });
 
-            return services;
-        }
+        return services;
     }
 }

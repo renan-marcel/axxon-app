@@ -1,11 +1,10 @@
 using MediatR;
 using ProdAbs.SharedKernel;
 
-namespace ProdAbs.Application.Features.Prontuarios.Commands
+namespace ProdAbs.Application.Features.Prontuarios.Commands;
+
+public class CriarProntuarioCommand : IRequest<Result<Guid>>
 {
-    public class CriarProntuarioCommand : IRequest<Result<System.Guid>>
-    {
-        public string IdentificadorEntidade { get; set; }
-        public string TipoProntuario { get; set; }
-    }
+    public string IdentificadorEntidade { get; set; }
+    public string TipoProntuario { get; set; }
 }

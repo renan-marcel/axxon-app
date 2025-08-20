@@ -1,32 +1,28 @@
 using ProdAbs.SharedKernel.BaseClasses;
 
-namespace ProdAbs.Domain.Entities
+namespace ProdAbs.Domain.Entities;
+
+public class Prontuario : AggregateRoot<Guid>
 {
-    public class Prontuario : AggregateRoot<Guid>
+    // Private constructor for EF Core
+    private Prontuario(Guid id) : base(id)
     {
-        public string IdentificadorEntidade { get; private set; }
-        public string TipoProntuario { get; private set; }
-        public List<Guid> DocumentoIds { get; private set; } = new List<Guid>();
+        IdentificadorEntidade = string.Empty;
+        TipoProntuario = string.Empty;
+    }
 
-        // Private constructor for EF Core
-        private Prontuario(Guid id) : base(id) 
-        {
-            IdentificadorEntidade = string.Empty;
-            TipoProntuario = string.Empty;
-        }
+    public Prontuario(Guid id, string identificadorEntidade, string tipoProntuario) : base(id)
+    {
+        IdentificadorEntidade = identificadorEntidade;
+        TipoProntuario = tipoProntuario;
+    }
 
-        public Prontuario(Guid id, string identificadorEntidade, string tipoProntuario) : base(id)
-        {
-            IdentificadorEntidade = identificadorEntidade;
-            TipoProntuario = tipoProntuario;
-        }
+    public string IdentificadorEntidade { get; private set; }
+    public string TipoProntuario { get; private set; }
+    public List<Guid> DocumentoIds { get; } = new();
 
-        public void AdicionarDocumento(Guid documentoId)
-        {
-            if (!DocumentoIds.Contains(documentoId))
-            {
-                DocumentoIds.Add(documentoId);
-            }
-        }
+    public void AdicionarDocumento(Guid documentoId)
+    {
+        if (!DocumentoIds.Contains(documentoId)) DocumentoIds.Add(documentoId);
     }
 }

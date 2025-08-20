@@ -1,11 +1,9 @@
-
 using ProdAbs.Domain.Entities;
 
-namespace ProdAbs.Domain.Interfaces
+namespace ProdAbs.Domain.Interfaces;
+
+public interface IDocumentoRepository
 {
-    public interface IDocumentoRepository
-    {
-        Task<Documento> GetByIdAsync(Guid id);
-        Task AddAsync(Documento documento);
-    }
+    Task<Documento> GetByIdAsync(Guid id);
+    Task AddAsync(Documento documento);
 }

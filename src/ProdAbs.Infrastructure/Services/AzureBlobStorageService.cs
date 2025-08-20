@@ -2,77 +2,70 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.SharedKernel;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace ProdAbs.Infrastructure.Services
+namespace ProdAbs.Infrastructure.Services;
+
+public class AzureBlobStorageService : IFileStorageService
 {
-    public class AzureBlobStorageService : IFileStorageService
+    private readonly BlobServiceClient _blobServiceClient;
+    private readonly string _containerName;
+
+    public AzureBlobStorageService(IConfiguration configuration)
     {
-        private readonly BlobServiceClient _blobServiceClient;
-        private readonly string _containerName;
+        var connectionString = configuration.GetConnectionString("blobs");
+        _containerName = "teste"; //configuration.get("StorageSettings:Azure:ContainerName");
+        _blobServiceClient = new BlobServiceClient(connectionString);
+    }
 
-        public AzureBlobStorageService(IConfiguration configuration)
+    public async Task<Result<string>> UploadAsync(Stream fileStream, string fileName, string contentType)
+    {
+        try
         {
-            var connectionString = configuration.GetConnectionString("blobs");
-            _containerName = "teste";//configuration.get("StorageSettings:Azure:ContainerName");
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            await containerClient.CreateIfNotExistsAsync();
+
+            var blobClient = containerClient.GetBlobClient(fileName);
+            await blobClient.UploadAsync(fileStream, true);
+
+            return Result.Ok(fileName);
         }
-
-        public async Task<Result<string>> UploadAsync(Stream fileStream, string fileName, string contentType)
+        catch (Exception ex)
         {
-            try
-            {
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                await containerClient.CreateIfNotExistsAsync();
-
-                var blobClient = containerClient.GetBlobClient(fileName);
-                await blobClient.UploadAsync(fileStream, true);
-
-                return Result.Ok(fileName);
-            }
-            catch (Exception ex)
-            {
-                return Result.Fail<string>(ex.Message);
-            }
+            return Result.Fail<string>(ex.Message);
         }
+    }
 
-        public async Task<Result<Stream>> GetAsync(string storageLocation)
+    public async Task<Result<Stream>> GetAsync(string storageLocation)
+    {
+        try
         {
-            try
-            {
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                var blobClient = containerClient.GetBlobClient(storageLocation);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(storageLocation);
 
-                if (!await blobClient.ExistsAsync())
-                {
-                    return Result.Fail<Stream>("File not found.");
-                }
+            if (!await blobClient.ExistsAsync()) return Result.Fail<Stream>("File not found.");
 
-                var downloadInfo = await blobClient.DownloadAsync();
-                return Result.Ok(downloadInfo.Value.Content);
-            }
-            catch (Exception ex)
-            {
-                return Result.Fail<Stream>(ex.Message);
-            }
+            var downloadInfo = await blobClient.DownloadAsync();
+            return Result.Ok(downloadInfo.Value.Content);
         }
-
-        public async Task<Result> DeleteAsync(string storageLocation)
+        catch (Exception ex)
         {
-            try
-            {
-                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                var blobClient = containerClient.GetBlobClient(storageLocation);
-                await blobClient.DeleteIfExistsAsync();
+            return Result.Fail<Stream>(ex.Message);
+        }
+    }
 
-                return Result.Ok();
-            }
-            catch (Exception ex)
-            {
-                return Result.Fail(ex.Message);
-            }
+    public async Task<Result> DeleteAsync(string storageLocation)
+    {
+        try
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(storageLocation);
+            await blobClient.DeleteIfExistsAsync();
+
+            return Result.Ok();
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(ex.Message);
         }
     }
 }

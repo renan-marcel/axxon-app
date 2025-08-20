@@ -1,13 +1,10 @@
 using MediatR;
-using ProdAbs.SharedKernel;
 using ProdAbs.Application.DTOs;
-using System;
-using System.Collections.Generic;
+using ProdAbs.SharedKernel;
 
-namespace ProdAbs.Application.Features.Prontuarios.Queries
+namespace ProdAbs.Application.Features.Prontuarios.Queries;
+
+public class GetDocumentosDoProntuarioQuery : IRequest<Result<List<DocumentoDTO>>>
 {
-    public class GetDocumentosDoProntuarioQuery : IRequest<Result<List<DocumentoDTO>>>
-    {
-        public Guid ProntuarioId { get; set; }
-    }
+    public Guid ProntuarioId { get; set; }
 }

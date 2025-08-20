@@ -1,12 +1,10 @@
 using MediatR;
-using ProdAbs.SharedKernel;
 using ProdAbs.Application.DTOs;
-using System;
+using ProdAbs.SharedKernel;
 
-namespace ProdAbs.Application.Features.Documentos.Queries
+namespace ProdAbs.Application.Features.Documentos.Queries;
+
+public class GetDocumentoByIdQuery : IRequest<Result<DocumentoDTO>>
 {
-    public class GetDocumentoByIdQuery : IRequest<Result<DocumentoDTO>>
-    {
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }

@@ -1,47 +1,60 @@
-namespace ProdAbs.SharedKernel
+namespace ProdAbs.SharedKernel;
+
+public class Result
 {
-    public class Result
+    protected Result(bool isSuccess, string error)
     {
-        public bool IsSuccess { get; }
-        public bool IsFailure => !IsSuccess;
-        public string Error { get; }
+        if (isSuccess && !string.IsNullOrEmpty(error))
+            throw new InvalidOperationException("A successful result cannot have an error message.");
+        if (!isSuccess && string.IsNullOrEmpty(error))
+            throw new InvalidOperationException("A failed result must have an error message.");
 
-        protected Result(bool isSuccess, string error)
-        {
-            if (isSuccess && !string.IsNullOrEmpty(error))
-                throw new InvalidOperationException("A successful result cannot have an error message.");
-            if (!isSuccess && string.IsNullOrEmpty(error))
-                throw new InvalidOperationException("A failed result must have an error message.");
-
-            IsSuccess = isSuccess;
-            Error = error;
-        }
-
-        public static Result Ok() => new Result(true, string.Empty);
-        public static Result Fail(string message) => new Result(false, message);
-
-        public static Result<T> Ok<T>(T value) => new Result<T>(value, true, string.Empty);
-        public static Result<T> Fail<T>(string message) => new Result<T>(default, false, message);
+        IsSuccess = isSuccess;
+        Error = error;
     }
 
-    public class Result<T> : Result
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    public string Error { get; }
+
+    public static Result Ok()
     {
-        private readonly T _value;
+        return new Result(true, string.Empty);
+    }
 
-        public T Value
-        {
-            get
-            {
-                if (!IsSuccess)
-                    throw new InvalidOperationException("Cannot access the value of a failed result.");
-                return _value;
-            }
-        }
+    public static Result Fail(string message)
+    {
+        return new Result(false, message);
+    }
 
-        protected internal Result(T value, bool isSuccess, string error)
-            : base(isSuccess, error)
+    public static Result<T> Ok<T>(T value)
+    {
+        return new Result<T>(value, true, string.Empty);
+    }
+
+    public static Result<T> Fail<T>(string message)
+    {
+        return new Result<T>(default, false, message);
+    }
+}
+
+public class Result<T> : Result
+{
+    private readonly T _value;
+
+    protected internal Result(T value, bool isSuccess, string error)
+        : base(isSuccess, error)
+    {
+        _value = value;
+    }
+
+    public T Value
+    {
+        get
         {
-            _value = value;
+            if (!IsSuccess)
+                throw new InvalidOperationException("Cannot access the value of a failed result.");
+            return _value;
         }
     }
 }

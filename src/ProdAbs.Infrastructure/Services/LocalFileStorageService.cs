@@ -2,74 +2,64 @@ using Microsoft.Extensions.Configuration;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.SharedKernel;
 
-namespace ProdAbs.Infrastructure.Services
+namespace ProdAbs.Infrastructure.Services;
+
+public class LocalFileStorageService : IFileStorageService
 {
-    public class LocalFileStorageService : IFileStorageService
+    private readonly string _storagePath;
+
+    public LocalFileStorageService(IConfiguration configuration)
     {
-        private readonly string _storagePath;
+        _storagePath = configuration.GetConnectionString("StorageSettings:Local:BasePath") ?? "uploads";
+        if (!Directory.Exists(_storagePath)) Directory.CreateDirectory(_storagePath);
+    }
 
-        public LocalFileStorageService(IConfiguration configuration)
+    public async Task<Result<string>> UploadAsync(Stream fileStream, string fileName, string contentType)
+    {
+        try
         {
-            _storagePath = configuration.GetConnectionString("StorageSettings:Local:BasePath") ?? "uploads";
-            if (!Directory.Exists(_storagePath))
-            {
-                Directory.CreateDirectory(_storagePath);
-            }
+            var storageFileName = $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
+            var filePath = Path.Combine(_storagePath, storageFileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await fileStream.CopyToAsync(stream);
+
+            return Result.Ok(storageFileName);
         }
-
-        public async Task<Result<string>> UploadAsync(Stream fileStream, string fileName, string contentType)
+        catch (Exception ex)
         {
-            try
-            {
-                var storageFileName = $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
-                var filePath = Path.Combine(_storagePath, storageFileName);
-
-                await using var stream = new FileStream(filePath, FileMode.Create);
-                await fileStream.CopyToAsync(stream);
-
-                return Result.Ok(storageFileName);
-            }
-            catch (Exception ex)
-            {
-                return Result.Fail<string>(ex.Message);
-            }
+            return Result.Fail<string>(ex.Message);
         }
+    }
 
-        public Task<Result<Stream>> GetAsync(string storageLocation)
+    public Task<Result<Stream>> GetAsync(string storageLocation)
+    {
+        try
         {
-            try
-            {
-                var filePath = Path.Combine(_storagePath, storageLocation);
-                if (!File.Exists(filePath))
-                {
-                    return Task.FromResult(Result.Fail<Stream>("File not found."));
-                }
+            var filePath = Path.Combine(_storagePath, storageLocation);
+            if (!File.Exists(filePath)) return Task.FromResult(Result.Fail<Stream>("File not found."));
 
-                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return Task.FromResult(Result.Ok<Stream>(stream));
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult(Result.Fail<Stream>(ex.Message));
-            }
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return Task.FromResult(Result.Ok<Stream>(stream));
         }
-
-        public Task<Result> DeleteAsync(string storageLocation)
+        catch (Exception ex)
         {
-            try
-            {
-                var filePath = Path.Combine(_storagePath, storageLocation);
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
+            return Task.FromResult(Result.Fail<Stream>(ex.Message));
+        }
+    }
 
-                return Task.FromResult(Result.Ok());
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult(Result.Fail(ex.Message));
-            }
+    public Task<Result> DeleteAsync(string storageLocation)
+    {
+        try
+        {
+            var filePath = Path.Combine(_storagePath, storageLocation);
+            if (File.Exists(filePath)) File.Delete(filePath);
+
+            return Task.FromResult(Result.Ok());
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(Result.Fail(ex.Message));
         }
     }
 }

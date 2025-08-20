@@ -1,7 +1,9 @@
+using Projects;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
-    .WithDataBindMount(source: "../../container-data/postgres/Data")
+    .WithDataBindMount("../../container-data/postgres/Data")
     .WithLifetime(ContainerLifetime.Persistent);
 
 var pgAdmin = postgres.WithPgAdmin(pgadmin => pgadmin.WithHostPort(9200));
@@ -17,7 +19,7 @@ var zookeeper = builder.AddContainer("zookeeper", "confluentinc/cp-zookeeper", "
     .WithEnvironment("ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL", "1")
     .WithEnvironment("ZOOKEEPER_AUTOPURGE_SNAP_RETAIN_COUNT", "3")
     .WithEnvironment("ZOOKEEPER_MAX_CLIENT_CNXNS", "1000")
-    .WithEndpoint(port: 2181, targetPort: 2181)
+    .WithEndpoint(2181, 2181)
     .WithLifetime(ContainerLifetime.Persistent);
 
 var kafka = builder.AddKafka("kafka")
@@ -25,22 +27,19 @@ var kafka = builder.AddKafka("kafka")
     .WithImage("kafka", "latest")
     .WithReferenceRelationship(zookeeper)
     .WithDataBindMount(
-        source: "../../container-data/kafka/data",
-        isReadOnly: false)
+        "../../container-data/kafka/data",
+        false)
     .WithEnvironment("KAFKA_CREATE_TOPICS", "documento-criado-topic:1:1")
     .WithEnvironment("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
     .WithLifetime(ContainerLifetime.Persistent)
     .WaitFor(zookeeper);
 
-var kafkaUI = kafka.WithKafkaUI(kafkaUi =>
-{
-    kafkaUi.WithHostPort(9100);
-});
+var kafkaUI = kafka.WithKafkaUI(kafkaUi => { kafkaUi.WithHostPort(9100); });
 
 var seq = builder.AddSeq("seq")
     .WithDataBindMount(
-        source: "../../container-data/seq/Data",
-        isReadOnly: false)
+        "../../container-data/seq/Data",
+        false)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEnvironment("ACCEPT_EULA", "Y");
 
@@ -54,7 +53,7 @@ var storage = builder.AddAzureStorage("storage")
     })
     .AddBlobs("blobs");
 
-builder.AddProject<Projects.ProdAbs_Presentation_Api>("prodabs-api")
+builder.AddProject<ProdAbs_Presentation_Api>("prodabs-api")
     .WithReference(postgres)
     .WithReference(kafka)
     .WithReference(gedDb)

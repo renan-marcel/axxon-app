@@ -1,3 +1,4 @@
+using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
@@ -9,7 +10,6 @@ using ProdAbs.Infrastructure;
 using ProdAbs.Infrastructure.Data;
 using ProdAbs.Presentation.Api;
 using Serilog;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +48,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "ProdAbs",
             ValidAudience = "ProdAbs",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("a-super-secret-key-for-mvp-that-is-long-enough"))
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes("a-super-secret-key-for-mvp-that-is-long-enough"))
         };
     });
 builder.Services.AddAuthorization();
@@ -78,7 +79,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });
@@ -98,7 +99,7 @@ app.UseExceptionHandler(c => c.Run(async context =>
     var exception = context.Features
         .Get<IExceptionHandlerPathFeature>()
         .Error;
-    
+
     if (exception is ValidationException validationException)
     {
         context.Response.StatusCode = 400;

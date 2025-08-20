@@ -1,12 +1,10 @@
-
 using ProdAbs.Domain.Entities;
 
-namespace ProdAbs.Domain.Interfaces
+namespace ProdAbs.Domain.Interfaces;
+
+public interface IProntuarioRepository
 {
-    public interface IProntuarioRepository
-    {
-        Task<Prontuario> GetByIdAsync(Guid id);
-        Task AddAsync(Prontuario prontuario);
-        Task UpdateAsync(Prontuario prontuario);
-    }
+    Task<Prontuario> GetByIdAsync(Guid id);
+    Task AddAsync(Prontuario prontuario);
+    Task UpdateAsync(Prontuario prontuario);
 }

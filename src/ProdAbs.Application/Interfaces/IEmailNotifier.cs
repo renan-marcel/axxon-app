@@ -1,9 +1,6 @@
-using System.Threading.Tasks;
+namespace ProdAbs.Application.Interfaces;
 
-namespace ProdAbs.Application.Interfaces
+public interface IEmailNotifier
 {
-    public interface IEmailNotifier
-    {
-        Task SendEmailAsync(string to, string subject, string body);
-    }
+    Task SendEmailAsync(string to, string subject, string body);
 }

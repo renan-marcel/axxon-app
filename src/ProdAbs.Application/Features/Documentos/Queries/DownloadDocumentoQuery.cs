@@ -1,13 +1,10 @@
-using System;
-using System.IO;
 using MediatR;
 using ProdAbs.Application.DTOs;
 using ProdAbs.SharedKernel;
 
-namespace ProdAbs.Application.Features.Documentos.Queries
+namespace ProdAbs.Application.Features.Documentos.Queries;
+
+public class DownloadDocumentoQuery : IRequest<Result<FileDownloadDTO>>
 {
-    public class DownloadDocumentoQuery : IRequest<Result<FileDownloadDTO>>
-    {
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }
