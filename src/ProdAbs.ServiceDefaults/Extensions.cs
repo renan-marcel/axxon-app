@@ -121,6 +121,16 @@ public static class Extensions
             });
         }
 
+        // Add prometheus scraping endpoint if supported
+        try
+        {
+            app.MapPrometheusScrapingEndpoint("/metrics");
+        }
+        catch
+        {
+            // Ignore if Prometheus exporter package not available at runtime
+        }
+
         return app;
     }
 }

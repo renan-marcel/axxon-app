@@ -1,3 +1,6 @@
+using System;
+using MassTransit;
+using MassTransit.KafkaIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -5,8 +8,9 @@ using ProdAbs.Application.Interfaces;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.Infrastructure.Data;
 using ProdAbs.Infrastructure.Data.Repositories;
+using ProdAbs.Infrastructure.Messaging;
 using ProdAbs.Infrastructure.Services;
-using System;
+using ProdAbs.SharedKernel.Events;
 
 namespace ProdAbs.Infrastructure
 {
@@ -37,6 +41,33 @@ namespace ProdAbs.Infrastructure
                     default:
                         return new LocalFileStorageService(configuration);
                 }
+            });
+
+            // Register application external services
+            services.AddScoped<IEmailNotifier, LocalEmailNotifier>();
+            services.AddScoped<IAuditLogger, SimpleAuditLogger>();
+
+            services.AddMassTransit(busConfig =>
+            {
+                busConfig.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+
+                busConfig.AddRider(rider =>
+                {
+                    rider.AddProducer<Guid, IDocumentoCriadoEvent>("documento-criado-topic");
+                    rider.AddConsumer<DocumentoCriadoConsumer>();
+
+                    rider.UsingKafka((context, k) =>
+                    {
+                        k.Host(configuration.GetConnectionString("kafka"));
+
+
+                        k.TopicEndpoint<IDocumentoCriadoEvent>("documento-criado-topic", "consumer-group-name", e =>
+                        {
+                            e.ConfigureConsumer<DocumentoCriadoConsumer>(context);
+                            e.AutoStart = true;
+                        });
+                    });
+                });
             });
 
             return services;

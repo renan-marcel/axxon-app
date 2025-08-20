@@ -27,7 +27,7 @@ var kafka = builder.AddKafka("kafka")
     .WithDataBindMount(
         source: "../../container-data/kafka/data",
         isReadOnly: false)
-    .WithEnvironment("KAFKA_CREATE_TOPICS", "Lancamentos:1:1")
+    .WithEnvironment("KAFKA_CREATE_TOPICS", "documento-criado-topic:1:1")
     .WithEnvironment("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
     .WithLifetime(ContainerLifetime.Persistent)
     .WaitFor(zookeeper);

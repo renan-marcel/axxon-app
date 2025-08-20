@@ -1,3 +1,4 @@
+using MassTransit;
 using MediatR;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Interfaces;
@@ -5,8 +6,6 @@ using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.SharedKernel;
 using ProdAbs.SharedKernel.Events;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Application.Features.Documentos.Handlers
 {
@@ -15,15 +14,18 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
         private readonly IDocumentoRepository _documentoRepository;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMediator _mediator;
+        private readonly ITopicProducer<Guid, IDocumentoCriadoEvent> _producer;
 
         public CriarDocumentoCommandHandler(
             IDocumentoRepository documentoRepository,
             IFileStorageService fileStorageService,
-            IMediator mediator)
+            IMediator mediator,
+            ITopicProducer<Guid, IDocumentoCriadoEvent> producer)
         {
             _documentoRepository = documentoRepository;
             _fileStorageService = fileStorageService;
             _mediator = mediator;
+            _producer = producer;
         }
 
         public async Task<Result<Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
@@ -56,15 +58,17 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
 
             await _documentoRepository.AddAsync(documento);
 
-            //// Publish event
-            //await _mediator.Publish(new DocumentoCriadoEvent
-            //{
-            //    Id = documento.Id,
-            //    TipoDocumentoId = documento.TipoDeDocumentoId,
-            //    StorageLocation = documento.StorageLocation,
-            //    TamanhoEmBytes = documento.TamanhoEmBytes,
-            //    HashValor = documento.HashValor
-            //}, cancellationToken);
+            // Publish event via MassTransit if available, otherwise via IMediator
+            var evt = new DocumentoCriadoEvent
+            {
+                Id = documento.Id,
+                TipoDocumentoId = documento.TipoDeDocumentoId,
+                StorageLocation = documento.StorageLocation,
+                TamanhoEmBytes = documento.TamanhoEmBytes,
+                HashValor = documento.HashValor
+            };
+
+            await _producer.Produce(documento.Id, evt, cancellationToken);
 
             return Result.Ok(documento.Id);
         }

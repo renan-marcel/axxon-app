@@ -115,6 +115,16 @@ app.UseExceptionHandler(c => c.Run(async context =>
 // Configure Serilog request logging
 app.UseSerilogRequestLogging();
 
+// Enable OpenTelemetry Prometheus scraping endpoint if available
+try
+{
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
+}
+catch
+{
+    // If OpenTelemetry Prometheus scraping isn't available in the environment, ignore
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

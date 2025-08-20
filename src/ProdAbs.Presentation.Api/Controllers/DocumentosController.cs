@@ -12,7 +12,7 @@ namespace ProdAbs.Presentation.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class DocumentosController : ControllerBase
     {
         private readonly IMediator _mediator;

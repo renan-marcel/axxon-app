@@ -1,6 +1,6 @@
 namespace ProdAbs.SharedKernel.Events
 {
-    public class DocumentoCriadoEvent
+    public class DocumentoCriadoEvent:  IDocumentoCriadoEvent
     {
         public Guid Id { get; set; }
         public Guid TipoDocumentoId { get; set; }
