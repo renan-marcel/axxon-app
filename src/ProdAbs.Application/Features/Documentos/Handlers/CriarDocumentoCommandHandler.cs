@@ -26,7 +26,7 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
             _mediator = mediator;
         }
 
-        public async Task<Result<System.Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
         {
             using var stream = request.File.OpenReadStream();
 
@@ -39,7 +39,7 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
 
             if (uploadResult.IsFailure)
             {
-                return Result.Failure<System.Guid>(uploadResult.Error);
+                return Result.Fail<Guid>(uploadResult.Error);
             }
 
             var documento = new Documento
@@ -51,7 +51,8 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
                 NomeArquivoOriginal = request.File.FileName,
                 Formato = request.File.ContentType,
                 TipoDeDocumentoId = request.TipoDocumentoId,
-                DicionarioDeCamposValores = request.DicionarioDeCamposValores,
+                DicionarioDeCamposValores = new Dictionary<string, string>(),
+                //DicionarioDeCamposValores = request.DicionarioDeCamposValores,
                 Versao = 1 // Initial version
             };
 

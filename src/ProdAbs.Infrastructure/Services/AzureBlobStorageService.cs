@@ -15,8 +15,8 @@ namespace ProdAbs.Infrastructure.Services
 
         public AzureBlobStorageService(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("StorageSettings:Azure:ConnectionString");
-            _containerName = configuration.GetConnectionString("StorageSettings:Azure:ContainerName");
+            var connectionString = configuration.GetConnectionString("blobs");
+            _containerName = "teste";//configuration.get("StorageSettings:Azure:ContainerName");
             _blobServiceClient = new BlobServiceClient(connectionString);
         }
 

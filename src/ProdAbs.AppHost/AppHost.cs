@@ -6,9 +6,9 @@ var postgres = builder.AddPostgres("postgres")
 
 var pgAdmin = postgres.WithPgAdmin(pgadmin => pgadmin.WithHostPort(9200));
 
-var ged_db = postgres.AddDatabase("ged-db");
+var gedDb = postgres.AddDatabase("gedDb");
 
-var event_store_db = postgres.AddDatabase("event-store-db");
+var eventStoreDb = postgres.AddDatabase("eventStoreDb");
 
 var zookeeper = builder.AddContainer("zookeeper", "confluentinc/cp-zookeeper", "latest")
     .WithEnvironment("ZOOKEEPER_CLIENT_PORT", "2181")
@@ -25,7 +25,7 @@ var kafka = builder.AddKafka("kafka")
     .WithImage("kafka", "latest")
     .WithReferenceRelationship(zookeeper)
     .WithDataBindMount(
-        source: "../../../container-data/kafka/data",
+        source: "../../container-data/kafka/data",
         isReadOnly: false)
     .WithEnvironment("KAFKA_CREATE_TOPICS", "Lancamentos:1:1")
     .WithEnvironment("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
@@ -39,7 +39,7 @@ var kafkaUI = kafka.WithKafkaUI(kafkaUi =>
 
 var seq = builder.AddSeq("seq")
     .WithDataBindMount(
-        source: "../../../container-data/seq/Data",
+        source: "../../container-data/seq/Data",
         isReadOnly: false)
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEnvironment("ACCEPT_EULA", "Y");
@@ -57,16 +57,16 @@ var storage = builder.AddAzureStorage("storage")
 builder.AddProject<Projects.ProdAbs_Presentation_Api>("prodabs-api")
     .WithReference(postgres)
     .WithReference(kafka)
-    .WithReference(ged_db)
-    .WithReference(event_store_db)
+    .WithReference(gedDb)
+    .WithReference(eventStoreDb)
     .WithReference(kafka)
     .WithReference(seq)
     .WithReference(storage)
     .WaitFor(storage)
     .WaitFor(kafka)
     .WaitFor(seq)
-    .WaitFor(ged_db)
-    .WaitFor(event_store_db)
+    .WaitFor(gedDb)
+    .WaitFor(eventStoreDb)
     .WithEnvironment("StorageSettings:Provider", "Azure");
 
 await builder.Build().RunAsync();

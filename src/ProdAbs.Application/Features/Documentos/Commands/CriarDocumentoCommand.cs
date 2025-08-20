@@ -10,6 +10,6 @@ namespace ProdAbs.Application.Features.Documentos.Commands
     {
         public IFormFile File { get; set; }
         public Guid TipoDocumentoId { get; set; }
-        public Dictionary<string, string> DicionarioDeCamposValores { get; set; }
+        //public Dictionary<string, string> DicionarioDeCamposValores { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace ProdAbs.CrossCutting
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(configuration.GetConnectionString("gedDb")));
 
             services.AddScoped<ITipoDeDocumentoRepository, TipoDeDocumentoRepository>();
             services.AddScoped<IDocumentoRepository, DocumentoRepository>();
@@ -23,7 +23,13 @@ namespace ProdAbs.CrossCutting
 
             services.AddScoped<IFileStorageService>(provider =>
             {
-                var storageProvider = configuration.GetConnectionString("StorageSettings:Provider");
+                var storageProvider = configuration["StorageSettings:Provider"];
+ 
+                if (string.IsNullOrEmpty(storageProvider))
+                {
+                    throw new InvalidOperationException("Storage provider is not configured.");
+                }
+
                 switch (storageProvider)
                 {
                     case "Azure":
