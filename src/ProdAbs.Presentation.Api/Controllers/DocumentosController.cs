@@ -57,7 +57,7 @@ namespace ProdAbs.Presentation.Api.Controllers
             // For MVP, we might need to retrieve these from the DTO or pass them along.
             // For now, just return the stream as a FileStreamResult.
             // This part needs refinement in Phase 5 when DTOs are fully defined.
-            return File(result.Value, "application/octet-stream", "download"); // Placeholder content type and file name
+            return File(result.Value.File, result.Value.ContentType, result.Value.FileName);
         }
     }
 }

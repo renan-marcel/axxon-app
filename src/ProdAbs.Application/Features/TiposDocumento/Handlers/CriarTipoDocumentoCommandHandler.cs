@@ -22,12 +22,11 @@ namespace ProdAbs.Application.Features.TiposDocumento.Handlers
 
         public async Task<Result<TipoDocumentoDetalhesDTO>> Handle(CriarTipoDocumentoCommand request, CancellationToken cancellationToken)
         {
-            var tipoDocumento = new TipoDocumento
-            {
-                Id = Guid.NewGuid(),
-                Nome = request.Nome,
-                Campos = request.Campos.Select(c => new Domain.ValueObjects.CampoMetadata { Label = c }).ToList()
-            };
+            var tipoDocumento = new TipoDocumento(
+                Guid.NewGuid(),
+                request.Nome,
+                request.Campos.Select(c => new Domain.ValueObjects.CampoMetadata(c, new Domain.ValueObjects.RegraValidacao(Domain.ValueObjects.TipoDeDados.String, false, string.Empty), string.Empty)).ToList()
+            );
 
             await _repository.AddAsync(tipoDocumento);
 

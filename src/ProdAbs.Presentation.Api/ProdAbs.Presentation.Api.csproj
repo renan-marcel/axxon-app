@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProdAbs.Application\ProdAbs.Application.csproj" />
     <ProjectReference Include="..\ProdAbs.Infrastructure\ProdAbs.Infrastructure.csproj" />
-    <ProjectReference Include="..\ProdAbs.CrossCutting\ProdAbs.CrossCutting.csproj" />
+    
     <ProjectReference Include="..\ProdAbs.ServiceDefaults\ProdAbs.ServiceDefaults.csproj" />
   </ItemGroup>
 

@@ -19,11 +19,11 @@ namespace ProdAbs.Application.Features.Prontuarios.Handlers
 
         public async Task<Result<System.Guid>> Handle(CriarProntuarioCommand request, CancellationToken cancellationToken)
         {
-            var prontuario = new Prontuario
-            {
-                IdentificadorEntidade = request.IdentificadorEntidade,
-                TipoProntuario = request.TipoProntuario
-            };
+            var prontuario = new Prontuario(
+                Guid.NewGuid(),
+                request.IdentificadorEntidade,
+                request.TipoProntuario
+            );
 
             await _prontuarioRepository.AddAsync(prontuario);
 

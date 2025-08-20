@@ -42,31 +42,29 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
                 return Result.Fail<Guid>(uploadResult.Error);
             }
 
-            var documento = new Documento
-            {
-                StorageLocation = uploadResult.Value,
-                TamanhoEmBytes = request.File.Length,
-                HashTipo = "SHA256",
-                HashValor = hash,
-                NomeArquivoOriginal = request.File.FileName,
-                Formato = request.File.ContentType,
-                TipoDeDocumentoId = request.TipoDocumentoId,
-                DicionarioDeCamposValores = new Dictionary<string, string>(),
-                //DicionarioDeCamposValores = request.DicionarioDeCamposValores,
-                Versao = 1 // Initial version
-            };
+            var documento = new Documento(
+                Guid.NewGuid(),
+                request.TipoDocumentoId,
+                uploadResult.Value,
+                request.File.Length,
+                "SHA256",
+                hash,
+                request.File.FileName,
+                request.File.ContentType,
+                new Dictionary<string, string>() // request.DicionarioDeCamposValores
+            );
 
             await _documentoRepository.AddAsync(documento);
 
-            // Publish event
-            await _mediator.Publish(new DocumentoCriadoEvent
-            {
-                Id = documento.Id,
-                TipoDocumentoId = documento.TipoDeDocumentoId,
-                StorageLocation = documento.StorageLocation,
-                TamanhoEmBytes = documento.TamanhoEmBytes,
-                HashValor = documento.HashValor
-            }, cancellationToken);
+            //// Publish event
+            //await _mediator.Publish(new DocumentoCriadoEvent
+            //{
+            //    Id = documento.Id,
+            //    TipoDocumentoId = documento.TipoDeDocumentoId,
+            //    StorageLocation = documento.StorageLocation,
+            //    TamanhoEmBytes = documento.TamanhoEmBytes,
+            //    HashValor = documento.HashValor
+            //}, cancellationToken);
 
             return Result.Ok(documento.Id);
         }

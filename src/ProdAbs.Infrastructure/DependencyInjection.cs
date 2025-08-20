@@ -8,11 +8,11 @@ using ProdAbs.Infrastructure.Data.Repositories;
 using ProdAbs.Infrastructure.Services;
 using System;
 
-namespace ProdAbs.CrossCutting
+namespace ProdAbs.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("gedDb")));
@@ -34,7 +34,6 @@ namespace ProdAbs.CrossCutting
                 {
                     case "Azure":
                         return new AzureBlobStorageService(configuration);
-                    case "Local":
                     default:
                         return new LocalFileStorageService(configuration);
                 }

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProdAbs.CrossCutting", "src\ProdAbs.CrossCutting\ProdAbs.CrossCutting.csproj", "{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProdAbs.Domain", "src\ProdAbs.Domain\ProdAbs.Domain.csproj", "{A9A03B2D-09B1-7D53-5559-FE23BC8AEF11}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProdAbs.Presentation.Api", "src\ProdAbs.Presentation.Api\ProdAbs.Presentation.Api.csproj", "{93DCAFE8-51AF-FC8A-B55B-076FAF189BCC}"
@@ -37,18 +35,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|x64.Build.0 = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Debug|x86.Build.0 = Debug|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|x64.ActiveCfg = Release|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|x64.Build.0 = Release|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|x86.ActiveCfg = Release|Any CPU
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5}.Release|x86.Build.0 = Release|Any CPU
 		{A9A03B2D-09B1-7D53-5559-FE23BC8AEF11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9A03B2D-09B1-7D53-5559-FE23BC8AEF11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9A03B2D-09B1-7D53-5559-FE23BC8AEF11}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -162,7 +148,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{AF0368B6-D7DF-AFB8-01DB-74BA69E185B5} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{A9A03B2D-09B1-7D53-5559-FE23BC8AEF11} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{93DCAFE8-51AF-FC8A-B55B-076FAF189BCC} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{4408F29F-CD81-221F-07B6-E6F35AAC2501} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}

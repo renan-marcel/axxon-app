@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProdAbs.Application;
-using ProdAbs.CrossCutting;
+using ProdAbs.Infrastructure;
 using ProdAbs.Infrastructure.Data;
+using ProdAbs.Presentation.Api;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +19,10 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 
-// Add application services
-builder.Services.AddApplication();
-
-// Add infrastructure services
-builder.Services.AddInfrastructure(builder.Configuration);
+// Add services from other layers
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddPresentationServices();
 
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -1,16 +1,52 @@
+using ProdAbs.SharedKernel.BaseClasses;
+
 namespace ProdAbs.Domain.Entities
 {
-    public class Documento
+    public class Documento : AggregateRoot<Guid>
     {
-        public Guid Id { get; set; }
-        public Guid TipoDeDocumentoId { get; set; }
-        public string StorageLocation { get; set; }
-        public long TamanhoEmBytes { get; set; }
-        public string HashTipo { get; set; }
-        public string HashValor { get; set; }
-        public string NomeArquivoOriginal { get; set; }
-        public string Formato { get; set; }
-        public int Versao { get; set; }
-        public IReadOnlyDictionary<string, string> DicionarioDeCamposValores { get; set; }
+        public Guid TipoDeDocumentoId { get; private set; }
+        public string StorageLocation { get; private set; }
+        public long TamanhoEmBytes { get; private set; }
+        public string HashTipo { get; private set; }
+        public string HashValor { get; private set; }
+        public string NomeArquivoOriginal { get; private set; }
+        public string Formato { get; private set; }
+        public int Versao { get; private set; }
+        public IReadOnlyDictionary<string, string> DicionarioDeCamposValores { get; private set; }
+
+        // Private constructor for EF Core
+        private Documento(Guid id) : base(id) 
+        {
+            TipoDeDocumentoId = Guid.Empty;
+            StorageLocation = string.Empty;
+            HashTipo = string.Empty;
+            HashValor = string.Empty;
+            NomeArquivoOriginal = string.Empty;
+            Formato = string.Empty;
+            DicionarioDeCamposValores = new Dictionary<string, string>();
+        }
+
+        public Documento(
+            Guid id,
+            Guid tipoDeDocumentoId,
+            string storageLocation,
+            long tamanhoEmBytes,
+            string hashTipo,
+            string hashValor,
+            string nomeArquivoOriginal,
+            string formato,
+            IReadOnlyDictionary<string, string> dicionarioDeCamposValores,
+            int versao = 1) : base(id)
+        {
+            TipoDeDocumentoId = tipoDeDocumentoId;
+            StorageLocation = storageLocation;
+            TamanhoEmBytes = tamanhoEmBytes;
+            HashTipo = hashTipo;
+            HashValor = hashValor;
+            NomeArquivoOriginal = nomeArquivoOriginal;
+            Formato = formato;
+            DicionarioDeCamposValores = dicionarioDeCamposValores;
+            Versao = versao;
+        }
     }
 }
