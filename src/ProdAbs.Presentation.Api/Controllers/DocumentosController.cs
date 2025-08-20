@@ -1,5 +1,5 @@
-
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.Documentos.Commands;
 using ProdAbs.Application.Features.Documentos.Queries;
@@ -12,6 +12,7 @@ namespace ProdAbs.Presentation.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Authorize]
     public class DocumentosController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -52,11 +53,6 @@ namespace ProdAbs.Presentation.Api.Controllers
                 return NotFound(result.Error);
             }
 
-            // Assuming the stream returned by DownloadDocumentoQuery is ready to be read
-            // and you have the original file name and content type from the DocumentoDTO
-            // For MVP, we might need to retrieve these from the DTO or pass them along.
-            // For now, just return the stream as a FileStreamResult.
-            // This part needs refinement in Phase 5 when DTOs are fully defined.
             return File(result.Value.File, result.Value.ContentType, result.Value.FileName);
         }
     }

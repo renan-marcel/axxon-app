@@ -8,9 +8,21 @@ using ProdAbs.Application;
 using ProdAbs.Infrastructure;
 using ProdAbs.Infrastructure.Data;
 using ProdAbs.Presentation.Api;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .WriteTo.Console()
+    .WriteTo.File("logs/prodabs-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
@@ -94,10 +106,14 @@ app.UseExceptionHandler(c => c.Run(async context =>
     }
     else
     {
+        Log.Error(exception, "An unhandled exception occurred");
         var response = new { error = exception.Message };
         await context.Response.WriteAsJsonAsync(response);
     }
 }));
+
+// Configure Serilog request logging
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
@@ -114,4 +130,16 @@ app.MapControllers();
 
 app.MapDefaultEndpoints();
 
-await app.RunAsync();
+try
+{
+    Log.Information("Starting web host");
+    await app.RunAsync();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

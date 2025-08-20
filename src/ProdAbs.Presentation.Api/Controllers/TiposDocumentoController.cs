@@ -1,5 +1,5 @@
-
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdAbs.Application.Features.TiposDocumento.Commands;
 using ProdAbs.Application.Features.TiposDocumento.Queries;
@@ -10,6 +10,7 @@ namespace ProdAbs.Presentation.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [Authorize]
     public class TiposDocumentoController : ControllerBase
     {
         private readonly IMediator _mediator;
