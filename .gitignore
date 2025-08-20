@@ -433,3 +433,6 @@ FodyWeavers.xsd
 
 # Gemini CLI settings
 .gemini/
+
+# Aspire Data
+/container-data/

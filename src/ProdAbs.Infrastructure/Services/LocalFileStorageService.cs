@@ -13,7 +13,7 @@ namespace ProdAbs.Infrastructure.Services
 
         public LocalFileStorageService(IConfiguration configuration)
         {
-            _storagePath = configuration.GetValue<string>("FileStorageSettings:BasePath") ?? "uploads";
+            _storagePath = configuration.GetValue<string>("StorageSettings:Local:BasePath") ?? "uploads";
             if (!Directory.Exists(_storagePath))
             {
                 Directory.CreateDirectory(_storagePath);

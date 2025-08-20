@@ -6,6 +6,7 @@ using ProdAbs.Domain.Interfaces;
 using ProdAbs.Infrastructure.Data;
 using ProdAbs.Infrastructure.Data.Repositories;
 using ProdAbs.Infrastructure.Services;
+using System;
 
 namespace ProdAbs.CrossCutting
 {
@@ -20,7 +21,18 @@ namespace ProdAbs.CrossCutting
             services.AddScoped<IDocumentoRepository, DocumentoRepository>();
             services.AddScoped<IProntuarioRepository, ProntuarioRepository>();
 
-            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            services.AddScoped<IFileStorageService>(provider =>
+            {
+                var storageProvider = configuration.GetValue<string>("StorageSettings:Provider");
+                switch (storageProvider)
+                {
+                    case "Azure":
+                        return new AzureBlobStorageService(configuration);
+                    case "Local":
+                    default:
+                        return new LocalFileStorageService(configuration);
+                }
+            });
 
             return services;
         }
