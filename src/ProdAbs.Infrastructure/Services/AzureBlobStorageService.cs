@@ -15,8 +15,8 @@ namespace ProdAbs.Infrastructure.Services
 
         public AzureBlobStorageService(IConfiguration configuration)
         {
-            var connectionString = configuration.GetValue<string>("StorageSettings:Azure:ConnectionString");
-            _containerName = configuration.GetValue<string>("StorageSettings:Azure:ContainerName");
+            var connectionString = configuration.GetConnectionString("StorageSettings:Azure:ConnectionString");
+            _containerName = configuration.GetConnectionString("StorageSettings:Azure:ContainerName");
             _blobServiceClient = new BlobServiceClient(connectionString);
         }
 
@@ -30,11 +30,11 @@ namespace ProdAbs.Infrastructure.Services
                 var blobClient = containerClient.GetBlobClient(fileName);
                 await blobClient.UploadAsync(fileStream, true);
 
-                return Result.Success(fileName);
+                return Result.Ok(fileName);
             }
             catch (Exception ex)
             {
-                return Result.Failure<string>(ex.Message);
+                return Result.Fail<string>(ex.Message);
             }
         }
 
@@ -47,15 +47,15 @@ namespace ProdAbs.Infrastructure.Services
 
                 if (!await blobClient.ExistsAsync())
                 {
-                    return Result.Failure<Stream>("File not found.");
+                    return Result.Fail<Stream>("File not found.");
                 }
 
                 var downloadInfo = await blobClient.DownloadAsync();
-                return Result.Success(downloadInfo.Value.Content);
+                return Result.Ok(downloadInfo.Value.Content);
             }
             catch (Exception ex)
             {
-                return Result.Failure<Stream>(ex.Message);
+                return Result.Fail<Stream>(ex.Message);
             }
         }
 
@@ -67,11 +67,11 @@ namespace ProdAbs.Infrastructure.Services
                 var blobClient = containerClient.GetBlobClient(storageLocation);
                 await blobClient.DeleteIfExistsAsync();
 
-                return Result.Success();
+                return Result.Ok();
             }
             catch (Exception ex)
             {
-                return Result.Failure(ex.Message);
+                return Result.Fail(ex.Message);
             }
         }
     }

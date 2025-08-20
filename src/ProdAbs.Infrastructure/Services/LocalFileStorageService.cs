@@ -1,9 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.SharedKernel;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ProdAbs.Infrastructure.Services
 {
@@ -13,7 +10,7 @@ namespace ProdAbs.Infrastructure.Services
 
         public LocalFileStorageService(IConfiguration configuration)
         {
-            _storagePath = configuration.GetValue<string>("StorageSettings:Local:BasePath") ?? "uploads";
+            _storagePath = configuration.GetConnectionString("StorageSettings:Local:BasePath") ?? "uploads";
             if (!Directory.Exists(_storagePath))
             {
                 Directory.CreateDirectory(_storagePath);
@@ -30,11 +27,11 @@ namespace ProdAbs.Infrastructure.Services
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await fileStream.CopyToAsync(stream);
 
-                return Result.Success(storageFileName);
+                return Result.Ok(storageFileName);
             }
             catch (Exception ex)
             {
-                return Result.Failure<string>(ex.Message);
+                return Result.Fail<string>(ex.Message);
             }
         }
 
@@ -45,15 +42,15 @@ namespace ProdAbs.Infrastructure.Services
                 var filePath = Path.Combine(_storagePath, storageLocation);
                 if (!File.Exists(filePath))
                 {
-                    return Task.FromResult(Result.Failure<Stream>("File not found."));
+                    return Task.FromResult(Result.Fail<Stream>("File not found."));
                 }
 
                 var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return Task.FromResult(Result.Success<Stream>(stream));
+                return Task.FromResult(Result.Ok<Stream>(stream));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(Result.Failure<Stream>(ex.Message));
+                return Task.FromResult(Result.Fail<Stream>(ex.Message));
             }
         }
 
@@ -67,11 +64,11 @@ namespace ProdAbs.Infrastructure.Services
                     File.Delete(filePath);
                 }
 
-                return Task.FromResult(Result.Success());
+                return Task.FromResult(Result.Ok());
             }
             catch (Exception ex)
             {
-                return Task.FromResult(Result.Failure(ex.Message));
+                return Task.FromResult(Result.Fail(ex.Message));
             }
         }
     }

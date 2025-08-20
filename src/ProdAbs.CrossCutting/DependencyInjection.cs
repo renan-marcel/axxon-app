@@ -23,7 +23,7 @@ namespace ProdAbs.CrossCutting
 
             services.AddScoped<IFileStorageService>(provider =>
             {
-                var storageProvider = configuration.GetValue<string>("StorageSettings:Provider");
+                var storageProvider = configuration.GetConnectionString("StorageSettings:Provider");
                 switch (storageProvider)
                 {
                     case "Azure":

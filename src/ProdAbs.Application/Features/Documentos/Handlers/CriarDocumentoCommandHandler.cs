@@ -28,27 +28,28 @@ namespace ProdAbs.Application.Features.Documentos.Handlers
 
         public async Task<Result<System.Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
         {
+            using var stream = request.File.OpenReadStream();
+
             // Calculate hash
-            request.FileStream.Seek(0, SeekOrigin.Begin); // Reset stream position
-            var hash = await HashUtility.CalculateSha256Async(request.FileStream);
+            var hash = await HashUtility.CalculateSha256Async(stream);
 
             // Upload file
-            request.FileStream.Seek(0, SeekOrigin.Begin); // Reset stream position again for upload
-            var uploadResult = await _fileStorageService.UploadAsync(request.FileStream, request.FileName, request.ContentType);
+            stream.Seek(0, SeekOrigin.Begin); // Reset stream position for upload
+            var uploadResult = await _fileStorageService.UploadAsync(stream, request.File.FileName, request.File.ContentType);
 
             if (uploadResult.IsFailure)
             {
-                return Result.Fail<System.Guid>(uploadResult.Error);
+                return Result.Failure<System.Guid>(uploadResult.Error);
             }
 
             var documento = new Documento
             {
                 StorageLocation = uploadResult.Value,
-                TamanhoEmBytes = request.FileStream.Length,
+                TamanhoEmBytes = request.File.Length,
                 HashTipo = "SHA256",
                 HashValor = hash,
-                NomeArquivoOriginal = request.FileName,
-                Formato = request.ContentType,
+                NomeArquivoOriginal = request.File.FileName,
+                Formato = request.File.ContentType,
                 TipoDeDocumentoId = request.TipoDocumentoId,
                 DicionarioDeCamposValores = request.DicionarioDeCamposValores,
                 Versao = 1 // Initial version

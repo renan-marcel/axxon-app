@@ -22,26 +22,15 @@ namespace ProdAbs.Presentation.Api.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadDocumento([FromForm] IFormFile file, [FromForm] Guid tipoDocumentoId)
+        public async Task<IActionResult> UploadDocumento([FromForm] CriarDocumentoCommand command)
         {
-            if (file == null || file.Length == 0)
+            if (command.File == null || command.File.Length == 0)
             {
                 return BadRequest("Arquivo não enviado.");
             }
 
-            using (var stream = new MemoryStream())
-            {
-                await file.CopyToAsync(stream);
-                var command = new CriarDocumentoCommand
-                {
-                    FileStream = stream,
-                    FileName = file.FileName,
-                    ContentType = file.ContentType,
-                    TipoDocumentoId = tipoDocumentoId
-                };
-                var result = await _mediator.Send(command);
-                return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
 
         [HttpGet("{id}")]
