@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -8,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ProdAbs.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ConfigureOwnedTypes : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,8 +38,7 @@ namespace ProdAbs.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     IdentificadorEntidade = table.Column<string>(type: "text", nullable: false),
-                    TipoProntuario = table.Column<string>(type: "text", nullable: false),
-                    DocumentoIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false)
+                    TipoProntuario = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

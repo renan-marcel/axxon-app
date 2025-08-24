@@ -17,8 +17,17 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(options =>
+        // Use a pooled DbContext for better performance under high throughput
+        services.AddDbContextPool<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("gedDb")));
+
+        // Also register an IDbContextFactory so repositories and background services can
+        // create short-lived DbContext instances on demand (works well with pooling)
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("gedDb")));
+
+        // Register the initializer so it can be run at startup or by host
+        services.AddScoped<DbInitializer>();
 
         services.AddScoped<ITipoDeDocumentoRepository, TipoDeDocumentoRepository>();
         services.AddScoped<IDocumentoRepository, DocumentoRepository>();

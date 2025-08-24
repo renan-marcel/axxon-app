@@ -6,26 +6,29 @@ namespace ProdAbs.Infrastructure.Data.Repositories;
 
 public class TipoDeDocumentoRepository : ITipoDeDocumentoRepository
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
-    public TipoDeDocumentoRepository(AppDbContext dbContext)
+    public TipoDeDocumentoRepository(IDbContextFactory<AppDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
-    public Task AddAsync(TipoDocumento tipoDocumento)
+    public async Task AddAsync(TipoDocumento tipoDocumento)
     {
-        _dbContext.TiposDeDocumento.Add(tipoDocumento);
-        return _dbContext.SaveChangesAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        dbContext.TiposDeDocumento.Add(tipoDocumento);
+        await dbContext.SaveChangesAsync();
     }
 
-    public Task<TipoDocumento> GetByIdAsync(Guid id)
+    public async Task<TipoDocumento> GetByIdAsync(Guid id)
     {
-        return _dbContext.TiposDeDocumento.FindAsync(id).AsTask();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.TiposDeDocumento.FindAsync(id).AsTask();
     }
 
-    public Task<List<TipoDocumento>> ListAsync()
+    public async Task<List<TipoDocumento>> ListAsync()
     {
-        return _dbContext.TiposDeDocumento.ToListAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.TiposDeDocumento.ToListAsync();
     }
 }

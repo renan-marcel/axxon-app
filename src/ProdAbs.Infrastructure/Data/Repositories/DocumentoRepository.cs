@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 
@@ -5,21 +6,23 @@ namespace ProdAbs.Infrastructure.Data.Repositories;
 
 public class DocumentoRepository : IDocumentoRepository
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
-    public DocumentoRepository(AppDbContext dbContext)
+    public DocumentoRepository(IDbContextFactory<AppDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
-    public Task AddAsync(Documento documento)
+    public async Task AddAsync(Documento documento)
     {
-        _dbContext.Documentos.Add(documento);
-        return _dbContext.SaveChangesAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        dbContext.Documentos.Add(documento);
+        await dbContext.SaveChangesAsync();
     }
 
-    public Task<Documento> GetByIdAsync(Guid id)
+    public async Task<Documento> GetByIdAsync(Guid id)
     {
-        return _dbContext.Documentos.FindAsync(id).AsTask();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.Documentos.FindAsync(id).AsTask();
     }
 }
