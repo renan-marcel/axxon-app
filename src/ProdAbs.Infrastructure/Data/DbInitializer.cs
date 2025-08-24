@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.ValueObjects;
@@ -26,7 +23,7 @@ public class DbInitializer
         {
             var tipo = new TipoDocumento(Guid.NewGuid(), "Documento Padrão", new List<CampoMetadata>
             {
-                new CampoMetadata("Campo1", new RegraValidacao(TipoDeDados.String, false, string.Empty), string.Empty)
+                new("Campo1", new RegraValidacao(TipoDeDados.String, false, string.Empty), string.Empty)
             });
 
             _context.TiposDeDocumento.Add(tipo);

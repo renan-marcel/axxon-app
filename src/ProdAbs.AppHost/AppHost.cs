@@ -27,8 +27,7 @@ var kafka = builder.AddKafka("kafka")
     .WithImage("kafka", "latest")
     .WithReferenceRelationship(zookeeper)
     .WithDataBindMount(
-        "../../container-data/kafka/data",
-        false)
+        "../../container-data/kafka/data")
     .WithEnvironment("KAFKA_CREATE_TOPICS", "documento-criado-topic:1:1")
     .WithEnvironment("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
     .WithLifetime(ContainerLifetime.Persistent)
@@ -38,8 +37,7 @@ var kafkaUI = kafka.WithKafkaUI(kafkaUi => { kafkaUi.WithHostPort(9100); });
 
 var seq = builder.AddSeq("seq")
     .WithDataBindMount(
-        "../../container-data/seq/Data",
-        false)
+        "../../container-data/seq/Data")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEnvironment("ACCEPT_EULA", "Y");
 

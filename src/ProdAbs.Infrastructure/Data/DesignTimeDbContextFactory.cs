@@ -1,7 +1,6 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System.IO;
-using System.Text.Json;
 
 namespace ProdAbs.Infrastructure.Data;
 
@@ -11,7 +10,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     public AppDbContext CreateDbContext(string[] args)
     {
         // Tentativa simples: ler appsettings.Development.json ou appsettings.json e extrair connection string 'gedDb'
-        string basePath = Directory.GetCurrentDirectory();
+        var basePath = Directory.GetCurrentDirectory();
         string[] candidates = new[] { "appsettings.Development.json", "appsettings.json" };
         string? json = null;
 
@@ -32,16 +31,15 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
             if (doc.RootElement.TryGetProperty("ConnectionStrings", out var cs) &&
                 cs.ValueKind == JsonValueKind.Object &&
                 cs.TryGetProperty("gedDb", out var ged))
-            {
                 conn = ged.GetString();
-            }
         }
 
         // fallback to environment variable
         conn ??= Environment.GetEnvironmentVariable("GEDDB_CONNECTION") ?? Environment.GetEnvironmentVariable("gedDb");
 
         if (string.IsNullOrEmpty(conn))
-            throw new InvalidOperationException("Connection string 'gedDb' not found (checked appsettings and environment variables).");
+            throw new InvalidOperationException(
+                "Connection string 'gedDb' not found (checked appsettings and environment variables).");
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseNpgsql(conn);
