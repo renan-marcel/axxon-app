@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ProdAbs.Domain.Entities;
 using ProdAbs.Domain.Interfaces;
 
@@ -5,27 +6,30 @@ namespace ProdAbs.Infrastructure.Data.Repositories;
 
 public class ProntuarioRepository : IProntuarioRepository
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
-    public ProntuarioRepository(AppDbContext dbContext)
+    public ProntuarioRepository(IDbContextFactory<AppDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
-    public Task AddAsync(Prontuario prontuario)
+    public async Task AddAsync(Prontuario prontuario)
     {
-        _dbContext.Prontuarios.Add(prontuario);
-        return _dbContext.SaveChangesAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        dbContext.Prontuarios.Add(prontuario);
+        await dbContext.SaveChangesAsync();
     }
 
-    public Task<Prontuario> GetByIdAsync(Guid id)
+    public async Task<Prontuario> GetByIdAsync(Guid id)
     {
-        return _dbContext.Prontuarios.FindAsync(id).AsTask();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.Prontuarios.FindAsync(id).AsTask();
     }
 
-    public Task UpdateAsync(Prontuario prontuario)
+    public async Task UpdateAsync(Prontuario prontuario)
     {
-        _dbContext.Prontuarios.Update(prontuario);
-        return _dbContext.SaveChangesAsync();
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        dbContext.Prontuarios.Update(prontuario);
+        await dbContext.SaveChangesAsync();
     }
 }

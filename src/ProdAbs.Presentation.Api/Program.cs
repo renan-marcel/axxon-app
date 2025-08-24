@@ -86,11 +86,19 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Apply migrations at startup
+// Initialize database at startup (apply migrations and seed)
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await dbContext.Database.MigrateAsync();
+    var initializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+    try
+    {
+        await initializer.InitializeAsync();
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Database initialization failed");
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
