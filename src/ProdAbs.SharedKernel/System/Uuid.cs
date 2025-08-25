@@ -48,7 +48,7 @@ namespace System;
     /// </summary>
     /// <param name="o">The object to compare with this instance.</param>
     /// <returns>true if o is a <paramref name="uuid"/> that has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || !(obj is Uuid))
         {

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace ProdAbs.SharedKernel;
 
 public class Result
@@ -42,7 +44,7 @@ public class Result<T> : Result
 {
     private readonly T _value;
 
-    protected internal Result(T value, bool isSuccess, string error)
+    protected internal Result([MaybeNull] T value, bool isSuccess, string error)
         : base(isSuccess, error)
     {
         _value = value;
