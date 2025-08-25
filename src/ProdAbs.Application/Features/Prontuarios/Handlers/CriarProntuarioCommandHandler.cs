@@ -9,10 +9,12 @@ namespace ProdAbs.Application.Features.Prontuarios.Handlers;
 public class CriarProntuarioCommandHandler : IRequestHandler<CriarProntuarioCommand, Result<Guid>>
 {
     private readonly IProntuarioRepository _prontuarioRepository;
+    private readonly TimeProvider _timeProvider;
 
-    public CriarProntuarioCommandHandler(IProntuarioRepository prontuarioRepository)
+    public CriarProntuarioCommandHandler(IProntuarioRepository prontuarioRepository, TimeProvider timeProvider)
     {
         _prontuarioRepository = prontuarioRepository;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Result<Guid>> Handle(CriarProntuarioCommand request, CancellationToken cancellationToken)
@@ -20,7 +22,8 @@ public class CriarProntuarioCommandHandler : IRequestHandler<CriarProntuarioComm
         var prontuario = new Prontuario(
             Guid.NewGuid(),
             request.IdentificadorEntidade,
-            request.TipoProntuario
+            request.TipoProntuario,
+            _timeProvider.GetUtcNow()
         );
 
         await _prontuarioRepository.AddAsync(prontuario);

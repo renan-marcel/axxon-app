@@ -12,19 +12,13 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
-    .WriteTo.File("logs/prodabs-.log", rollingInterval: RollingInterval.Day)
-    .WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
-    .Enrich.FromLogContext()
-    .CreateLogger();
-
-builder.Host.UseSerilog();
+// Configure Seq
+builder.AddSeqEndpoint(connectionName: "seq");
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
+
+builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -32,7 +26,7 @@ builder.Services.AddProblemDetails();
 
 // Add services from other layers
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration, builder.Environment);
 builder.Services.AddPresentationServices();
 
 // Add Authentication
@@ -119,9 +113,6 @@ app.UseExceptionHandler(c => c.Run(async context =>
         await context.Response.WriteAsJsonAsync(response);
     }
 }));
-
-// Configure Serilog request logging
-app.UseSerilogRequestLogging();
 
 // Enable OpenTelemetry Prometheus scraping endpoint if available
 try

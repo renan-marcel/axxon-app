@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.SharedKernel;
 
@@ -8,7 +9,7 @@ public class LocalFileStorageService : IFileStorageService
 {
     private readonly string _storagePath;
 
-    public LocalFileStorageService(IConfiguration configuration)
+    public LocalFileStorageService(IConfiguration configuration, IHostEnvironment env)
     {
         _storagePath = configuration.GetConnectionString("StorageSettings:Local:BasePath") ?? "uploads";
         if (!Directory.Exists(_storagePath)) Directory.CreateDirectory(_storagePath);

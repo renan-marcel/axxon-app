@@ -13,30 +13,31 @@ public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoComman
 {
     private readonly IDocumentoRepository _documentoRepository;
     private readonly IFileStorageService _fileStorageService;
-    private readonly IMediator _mediator;
     private readonly ITopicProducer<Guid, IDocumentoCriadoEvent> _producer;
+    private readonly TimeProvider _timeProvider;
 
     public CriarDocumentoCommandHandler(
         IDocumentoRepository documentoRepository,
         IFileStorageService fileStorageService,
-        IMediator mediator,
-        ITopicProducer<Guid, IDocumentoCriadoEvent> producer)
+        ITopicProducer<Guid, IDocumentoCriadoEvent> producer, TimeProvider timeProvider)
     {
         _documentoRepository = documentoRepository;
         _fileStorageService = fileStorageService;
-        _mediator = mediator;
         _producer = producer;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Result<Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
     {
         using var stream = request.File.OpenReadStream();
 
-        // Calculate hash
+        //var fileId = Guid.NewGuid();
+
+        //var filename = $"{fileId}{Path.GetExtension(request.File.FileName)}";
+
         var hash = await HashUtility.CalculateSha256Async(stream);
 
-        // Upload file
-        stream.Seek(0, SeekOrigin.Begin); // Reset stream position for upload
+        stream.Seek(0, SeekOrigin.Begin);
         var uploadResult =
             await _fileStorageService.UploadAsync(stream, request.File.FileName, request.File.ContentType);
 
@@ -51,7 +52,8 @@ public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoComman
             hash,
             request.File.FileName,
             request.File.ContentType,
-            new Dictionary<string, string>() // request.DicionarioDeCamposValores
+            _timeProvider.GetUtcNow(),
+            new Dictionary<string, string>()
         );
 
         await _documentoRepository.AddAsync(documento);

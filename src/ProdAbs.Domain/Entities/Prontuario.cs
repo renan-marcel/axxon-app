@@ -1,8 +1,9 @@
 using ProdAbs.SharedKernel.BaseClasses;
+using ProdAbs.SharedKernel.Interfaces;
 
 namespace ProdAbs.Domain.Entities;
 
-public class Prontuario : AggregateRoot<Guid>
+public class Prontuario : AggregateRoot<Guid>, IHasCreatedDate
 {
     // Private constructor for EF Core
     private Prontuario(Guid id) : base(id)
@@ -11,10 +12,11 @@ public class Prontuario : AggregateRoot<Guid>
         TipoProntuario = string.Empty;
     }
 
-    public Prontuario(Guid id, string identificadorEntidade, string tipoProntuario) : base(id)
+    public Prontuario(Guid id, string identificadorEntidade, string tipoProntuario, DateTimeOffset createdDate) : base(id)
     {
         IdentificadorEntidade = identificadorEntidade;
         TipoProntuario = tipoProntuario;
+        CreatedDate = createdDate;
     }
 
     public string IdentificadorEntidade { get; private set; }
@@ -25,4 +27,6 @@ public class Prontuario : AggregateRoot<Guid>
     {
         if (!DocumentoIds.Contains(documentoId)) DocumentoIds.Add(documentoId);
     }
+
+    public DateTimeOffset CreatedDate { get; }
 }

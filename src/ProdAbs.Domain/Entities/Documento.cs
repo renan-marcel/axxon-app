@@ -1,8 +1,9 @@
 using ProdAbs.SharedKernel.BaseClasses;
+using ProdAbs.SharedKernel.Interfaces;
 
 namespace ProdAbs.Domain.Entities;
 
-public class Documento : AggregateRoot<Guid>
+public class Documento : AggregateRoot<Guid>, IHasCreatedDate
 {
     // Private constructor for EF Core
     private Documento(Guid id) : base(id)
@@ -25,6 +26,7 @@ public class Documento : AggregateRoot<Guid>
         string hashValor,
         string nomeArquivoOriginal,
         string formato,
+        DateTimeOffset createdDate,
         IReadOnlyDictionary<string, string> dicionarioDeCamposValores,
         int versao = 1) : base(id)
     {
@@ -37,6 +39,7 @@ public class Documento : AggregateRoot<Guid>
         Formato = formato;
         DicionarioDeCamposValores = dicionarioDeCamposValores;
         Versao = versao;
+        CreatedDate = createdDate;
     }
 
     public Guid TipoDeDocumentoId { get; private set; }
@@ -47,5 +50,7 @@ public class Documento : AggregateRoot<Guid>
     public string NomeArquivoOriginal { get; private set; }
     public string Formato { get; private set; }
     public int Versao { get; private set; }
+
     public IReadOnlyDictionary<string, string> DicionarioDeCamposValores { get; private set; }
+    public DateTimeOffset CreatedDate { get; }
 }

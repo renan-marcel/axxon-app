@@ -24,7 +24,7 @@ public class DownloadDocumentoQueryHandler : IRequestHandler<DownloadDocumentoQu
     {
         var documento = await _documentoRepository.GetByIdAsync(request.Id);
 
-        if (documento == null) return Result.Fail<FileDownloadDTO>("Documento não encontrado.");
+        if (documento is null) return Result.Fail<FileDownloadDTO>("Documento não encontrado.");
 
         var fileStreamResult = await _fileStorageService.GetAsync(documento.StorageLocation);
 

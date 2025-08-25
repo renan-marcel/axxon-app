@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.SharedKernel;
 
@@ -8,12 +9,12 @@ namespace ProdAbs.Infrastructure.Services;
 public class AzureBlobStorageService : IFileStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
-    private readonly string _containerName;
+    private readonly string? _containerName;
 
-    public AzureBlobStorageService(IConfiguration configuration)
+    public AzureBlobStorageService(IConfiguration configuration, IHostEnvironment env)
     {
-        var connectionString = configuration.GetConnectionString("blobs");
-        _containerName = "teste"; //configuration.get("StorageSettings:Azure:ContainerName");
+        var connectionString = configuration.GetConnectionString("azure-blob-connection");
+        _containerName = configuration["storage-settings:azure:container-name"];
         _blobServiceClient = new BlobServiceClient(connectionString);
     }
 

@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ProdAbs.Application.Interfaces;
 using ProdAbs.Domain.Interfaces;
 using ProdAbs.Infrastructure.Data;
@@ -15,7 +16,7 @@ namespace ProdAbs.Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration, IHostEnvironment environment)
     {
         // Use a pooled DbContext for better performance under high throughput
         services.AddDbContextPool<AppDbContext>(options =>
@@ -35,7 +36,7 @@ public static class DependencyInjection
 
         services.AddScoped<IFileStorageService>(provider =>
         {
-            var storageProvider = configuration["StorageSettings:Provider"];
+            var storageProvider = configuration["storage-settings:provider"];
 
             if (string.IsNullOrEmpty(storageProvider))
                 throw new InvalidOperationException("Storage provider is not configured.");
@@ -43,13 +44,14 @@ public static class DependencyInjection
             switch (storageProvider)
             {
                 case "Azure":
-                    return new AzureBlobStorageService(configuration);
+                    return new AzureBlobStorageService(configuration, environment);
+                case "AWS":
+                    return new S3FileStorageService(configuration, environment);
                 default:
-                    return new LocalFileStorageService(configuration);
+                    return new LocalFileStorageService(configuration, environment);
             }
         });
 
-        // Register application external services
         services.AddScoped<IEmailNotifier, LocalEmailNotifier>();
         services.AddScoped<IAuditLogger, SimpleAuditLogger>();
 

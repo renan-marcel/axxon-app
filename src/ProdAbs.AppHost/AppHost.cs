@@ -49,7 +49,7 @@ var storage = builder.AddAzureStorage("storage")
             .WithQueuePort(27001)
             .WithTablePort(27002);
     })
-    .AddBlobs("blobs");
+    .AddBlobs("azure-blob-connection");
 
 builder.AddProject<ProdAbs_Presentation_Api>("prodabs-api")
     .WithReference(postgres)
@@ -64,6 +64,7 @@ builder.AddProject<ProdAbs_Presentation_Api>("prodabs-api")
     .WaitFor(seq)
     .WaitFor(gedDb)
     .WaitFor(eventStoreDb)
-    .WithEnvironment("StorageSettings:Provider", "Azure");
+    .WithEnvironment("storage-settings:provider", "Azure")
+    .WithEnvironment("storage-settings:azure:container-name", "app-container");
 
 await builder.Build().RunAsync();
