@@ -64,7 +64,7 @@ builder.AddProject<ProdAbs_Presentation_Api>("prodabs-api")
     .WaitFor(seq)
     .WaitFor(gedDb)
     .WaitFor(eventStoreDb)
-    .WithEnvironment("storage-settings:provider", "Azure")
+    .WithEnvironment("storage-settings:provider", "Aws")
     .WithEnvironment("storage-settings:azure:container-name", "app-container");
 
 await builder.Build().RunAsync();

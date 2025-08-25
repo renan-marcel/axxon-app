@@ -45,7 +45,7 @@ public static class DependencyInjection
             {
                 case "Azure":
                     return new AzureBlobStorageService(configuration, environment);
-                case "AWS":
+                case "Aws":
                     return new S3FileStorageService(configuration, environment);
                 default:
                     return new LocalFileStorageService(configuration, environment);

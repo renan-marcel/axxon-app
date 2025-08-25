@@ -8,7 +8,6 @@ using ProdAbs.Application;
 using ProdAbs.Infrastructure;
 using ProdAbs.Infrastructure.Data;
 using ProdAbs.Presentation.Api;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,7 +88,9 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "Database initialization failed");
+        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger<Program>();
+        logger.LogError(ex, "Database initialization failed");
         throw;
     }
 }
@@ -97,20 +98,25 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler(c => c.Run(async context =>
 {
-    var exception = context.Features
-        .Get<IExceptionHandlerPathFeature>()
-        .Error;
+    using (var scope = app.Services.CreateScope())
+    {
+        var exception = context.Features
+            .Get<IExceptionHandlerPathFeature>()
+            .Error;
 
-    if (exception is ValidationException validationException)
-    {
-        context.Response.StatusCode = 400;
-        await context.Response.WriteAsJsonAsync(new { error = validationException.Errors.First().ErrorMessage });
-    }
-    else
-    {
-        Log.Error(exception, "An unhandled exception occurred");
-        var response = new { error = exception.Message };
-        await context.Response.WriteAsJsonAsync(response);
+        if (exception is ValidationException validationException)
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new { error = validationException.Errors.First().ErrorMessage });
+        }
+        else
+        {
+            var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogError(exception, "An unhandled exception occurred");
+            var response = new { error = exception.Message };
+            await context.Response.WriteAsJsonAsync(response);
+        }
     }
 }));
 
@@ -139,16 +145,17 @@ app.MapControllers();
 
 app.MapDefaultEndpoints();
 
-try
+using (var scope = app.Services.CreateScope())
 {
-    Log.Information("Starting web host");
-    await app.RunAsync();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Host terminated unexpectedly");
-}
-finally
-{
-    Log.CloseAndFlush();
+    var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+    try
+    {
+        logger.LogInformation("Starting web host");
+        await app.RunAsync();
+    }
+    catch (Exception ex)
+    {
+        logger.LogCritical(ex, "Host terminated unexpectedly");
+    }
 }

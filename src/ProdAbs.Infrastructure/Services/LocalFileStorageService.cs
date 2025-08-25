@@ -19,13 +19,12 @@ public class LocalFileStorageService : IFileStorageService
     {
         try
         {
-            var storageFileName = $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
-            var filePath = Path.Combine(_storagePath, storageFileName);
+            var filePath = Path.Combine(_storagePath, fileName);
 
             await using var stream = new FileStream(filePath, FileMode.Create);
             await fileStream.CopyToAsync(stream);
 
-            return Result.Ok(storageFileName);
+            return Result.Ok(fileName);
         }
         catch (Exception ex)
         {
@@ -63,4 +62,6 @@ public class LocalFileStorageService : IFileStorageService
             return Task.FromResult(Result.Fail(ex.Message));
         }
     }
+
+    public string StorageName { get; } = "LocalFileStorage";
 }

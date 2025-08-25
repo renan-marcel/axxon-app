@@ -47,6 +47,8 @@ namespace ProdAbs.Infrastructure.Services
             }
         }
 
+        public string StorageName { get; } = "S3FileStorage";
+
         public async Task<Result<Stream>> GetAsync(string storageLocation)
         {
             try
@@ -58,7 +60,7 @@ namespace ProdAbs.Infrastructure.Services
                 };
 
                 var response = await _s3Client.GetObjectAsync(getObjectRequest);
-                return Result.Ok<Stream>(response.ResponseStream);
+                return Result.Ok(response.ResponseStream);
             }
             catch (AmazonS3Exception e)
             {
@@ -79,7 +81,7 @@ namespace ProdAbs.Infrastructure.Services
                 };
 
                 await _s3Client.PutObjectAsync(putObjectRequest);
-                return Result.Ok<string>(fileName);
+                return Result.Ok(fileName);
             }
             catch (AmazonS3Exception e)
             {

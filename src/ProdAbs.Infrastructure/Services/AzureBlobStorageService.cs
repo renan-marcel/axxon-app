@@ -69,4 +69,6 @@ public class AzureBlobStorageService : IFileStorageService
             return Result.Fail(ex.Message);
         }
     }
+
+    public string StorageName { get; } = "AzureBlobStorage";
 }

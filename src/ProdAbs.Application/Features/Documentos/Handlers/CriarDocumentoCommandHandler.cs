@@ -30,10 +30,10 @@ public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoComman
     public async Task<Result<Guid>> Handle(CriarDocumentoCommand request, CancellationToken cancellationToken)
     {
         using var stream = request.File.OpenReadStream();
+        
+        var fileId = Guid.NewGuid();
 
-        //var fileId = Guid.NewGuid();
-
-        //var filename = $"{fileId}{Path.GetExtension(request.File.FileName)}";
+        var filename = $"{fileId}{Path.GetExtension(request.File.FileName)}";
 
         var hash = await HashUtility.CalculateSha256Async(stream);
 
@@ -46,7 +46,7 @@ public class CriarDocumentoCommandHandler : IRequestHandler<CriarDocumentoComman
         var documento = new Documento(
             Guid.NewGuid(),
             request.TipoDocumentoId,
-            uploadResult.Value,
+            _fileStorageService.StorageName,
             request.File.Length,
             "SHA256",
             hash,
